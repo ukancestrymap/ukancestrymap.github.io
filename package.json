@@ -8,7 +8,8 @@
     "topojson-client": "^3.0.0",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
-    "react-scripts": "3.0.1"
+    "react-scripts": "3.0.1",
+    "@blueprintjs/core": "^3.17.0"
   },
   "scripts": {
     "start": "react-scripts start",
