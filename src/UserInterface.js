@@ -9,17 +9,17 @@ class UserInterface extends React.Component {
           <H5>To Display</H5>
           <HTMLSelect 
               fill={true}
-              options={this.props.data_options} 
-              onChange={this.props.data_callback}
-              value={this.props.data}
+              options={this.props.display_data_options} 
+              onChange={this.props.display_data_callback}
+              value={this.props.display_data_index}
           />
           <Slider
               min={this.props.ancestory_min}
               max={this.props.ancestory_max}
               stepSize={this.props.ancestory_step}
               labelStepSize={this.props.ancestory_step}
-              onChange={this.props.ancestory_callback}
-              value={this.props.ancestory}
+              onChange={this.props.display_timespan_callback}
+              value={this.props.display_timespan}
           />
       </Card>
     )
