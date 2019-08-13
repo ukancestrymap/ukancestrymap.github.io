@@ -30,9 +30,9 @@ class UkMap extends React.Component {
     const pathGenerator = geoPath()
       .projection(projection);
     var postcodes;
-    if (this.state.uk_geojson) {
+    if (this.props.uk_geojson && this.props.selected_postcode_data) {
       postcodes = this.props.uk_geojson.features.map((d, i) => {
-        const backend_index = this.props.backend_indices[i];
+        const backend_index = this.props.backend_postcode_indices[i];
         const color = this.props.selected_postcode_data[backend_index];
         return <path
         key = {'path' + i}

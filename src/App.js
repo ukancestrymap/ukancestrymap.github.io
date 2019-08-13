@@ -29,6 +29,7 @@ class App extends React.Component {
         display_data_index: 0,
         display_timespan: 10
       };
+
       var uk_topojson = json("/uk-postcode-area.json");
       var backend_api = this.get_postcode_api();
       Promise.all([uk_topojson, backend_api]).then((values) => {
@@ -43,8 +44,10 @@ class App extends React.Component {
           uk_geojson: feature(uk_topojson, uk_topojson.objects[
             'uk-postcode-area']),
           backend_api: backend_api,
-          backend_indices: indicies
+          backend_postcode_indices: indicies
         });
+      }).then(() => {
+        this.get_postcode_data(this.state.display_data_index, this.state.selected_postcode_index);
       });
     }
 
@@ -114,6 +117,7 @@ class App extends React.Component {
     console.log('getting api at ' + url);
     return axios.get(url);
   }
+
   get_postcode_data(display_data_index, selected_postcode_index) {
     const display_data = display_data_options[display_data_index];
     const url = this.state.backend_api[selected_postcode_index]['all'][display_data];
