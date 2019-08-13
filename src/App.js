@@ -13,7 +13,8 @@ import {
 } from "topojson-client"
 
 
-axios.defaults.baseURL = 'http://localhost:5000'
+//axios.defaults.baseURL = 'http://localhost:5000'
+axios.defaults.baseURL = 'https://fastsmc-app-backend.azurewebsites.net'
 
 class App extends React.Component {
     constructor(props) {
