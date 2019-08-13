@@ -9,15 +9,19 @@ class UserInterface extends React.Component {
           <H5>To Display</H5>
           <HTMLSelect 
               fill={true}
+              options={this.props.display_pop_options} 
+              onChange={this.props.display_pop_callback}
+          />
+          <HTMLSelect 
+              fill={true}
               options={this.props.display_data_options} 
               onChange={this.props.display_data_callback}
-              value={this.props.display_data_index}
           />
           <Slider
-              min={this.props.ancestory_min}
-              max={this.props.ancestory_max}
-              stepSize={this.props.ancestory_step}
-              labelStepSize={this.props.ancestory_step}
+              min={this.props.display_timespan_min}
+              max={this.props.display_timespan_max}
+              stepSize={1}
+              labelStepSize={this.props.display_timespan_step}
               onChange={this.props.display_timespan_callback}
               value={this.props.display_timespan}
           />
