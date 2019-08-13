@@ -25,7 +25,7 @@ class App extends React.Component {
         backend_postcode_indices: null,
         selected_postcode_data: null,
         postcode_data_stride: 0,
-        selected_postcode_index: 0,
+        selected_postcode_index: 30,
         height: 100,
         display_data_index: 0,
         display_data_options: null,
@@ -94,7 +94,7 @@ class App extends React.Component {
       window.removeEventListener("resize", this.updateDimensions.bind(this));
     }
     render() {
-        
+
         return (
             <div className="App" ref={element => this.div_ref = element}>
       <UkMap 
@@ -106,6 +106,9 @@ class App extends React.Component {
         uk_geojson = {this.state.uk_geojson}
         backend_postcode_indices= {this.state.backend_postcode_indices}
         selected_postcode_data= {this.state.selected_postcode_data}
+        select_postcode = {this.select_postcode }
+        postcode_data_min= {this.state.postcode_data_min}
+        postcode_data_max= {this.state.postcode_data_max}
         postcode_data_stride = {this.state.postcode_data_stride}
       />
       <div className="RHS">
@@ -137,6 +140,8 @@ class App extends React.Component {
     return axios.get(url);
   }
 
+
+
   get_postcode_data(display_data_index, selected_postcode_index, display_pop_index) {
     const display_data = this.state.display_data_options[display_data_index];
     const display_pop = this.state.display_pop_options[display_pop_index];
@@ -149,15 +154,30 @@ class App extends React.Component {
       }).then((response) => {
         // handle success
         const bytes = response.data;
-        const floats = new Float32Array(bytes);
+        const floats_tmp = new Float32Array(bytes);
+        // get rid of nans
+        const floats = floats_tmp.map((i) => i || 0);
+
+        const min = Math.min(...floats);
+        const max = Math.max(...floats);
+
         this.setState({
-          selected_postcode_data: floats 
+          selected_postcode_data: floats,
+          postcode_data_min: min,
+          postcode_data_max: max 
         });
       })
       .catch(function(error) {
         console.log('Error getting postcode_data: ' + error);
       });
   }
+
+  select_postcode = (postcode_index) => {
+    this.setState({
+      selected_postcode_index: postcode_index 
+    });
+    this.get_postcode_data(this.state.display_data_index, postcode_index, this.state.display_pop_index);
+  };
 
   display_data_callback = (event) => {
     const value = event.currentTarget.selectedIndex;
