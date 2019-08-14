@@ -35,7 +35,7 @@ class App extends React.Component {
         display_timespan: 10,
       };
 
-      var uk_topojson = json("/uk-postcode-area.json");
+      var uk_topojson = json("uk-postcode-area.json");
       var backend_api = this.get_postcode_api();
       Promise.all([uk_topojson, backend_api]).then((values) => {
         const uk_topojson = values[0];
