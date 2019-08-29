@@ -3,6 +3,8 @@ import axios from 'axios';
 import './App.css';
 import UkMap from './UkMap.js';
 import UserInterface from './UserInterface.js';
+import PostcodeInfo from './PostcodeInfo.js';
+import Data from './Data.js';
 
 import {
   json
@@ -21,12 +23,11 @@ class App extends React.Component {
       super(props)
       this.state = {
         uk_geojson: null,
-        backend_thresholds: null,
         backend_api: null,
         backend_postcode_indices: null,
-        selected_postcode_data: null,
-        postcode_data_stride: 0,
+        postcode_data: null,
         selected_postcode_index: 30,
+        mouseover_postcode_index: 30,
         height: 100,
         display_data_index: 0,
         display_data_options: null,
@@ -52,12 +53,11 @@ class App extends React.Component {
         this.setState({
           uk_geojson: feature(uk_topojson, uk_topojson.objects[
             'uk-postcode-area']),
+          postcode_names: names_json,
           backend_api: backend_api,
           display_data_options: display_data_options,
           display_pop_options: display_pop_options,
-          backend_postcode_indices: indicies,
-          postcode_data_stride: backend_thresholds.length,
-          backend_thresholds: backend_thresholds
+          postcode_data: new Data(indicies, backend_thresholds),
         });
       }).then(() => {
         this.get_postcode_data(this.state.display_data_index, this.state
@@ -95,6 +95,9 @@ class App extends React.Component {
       window.removeEventListener("resize", this.updateDimensions.bind(this));
     }
     render() {
+        if (this.state.postcode_data) {
+          this.state.postcode_data.set_threshold(this.state.display_timespan);
+        }
 
         return (
             <div className="App" ref={element => this.div_ref = element}>
@@ -102,18 +105,15 @@ class App extends React.Component {
         className="UkMap" 
         ref={element => this.map_ref = element}
         height = {this.state.height}
-        display_timespan = {this.state.display_timespan}
-        backend_thresholds = {this.state.backend_thresholds}
         uk_geojson = {this.state.uk_geojson}
-        backend_postcode_indices= {this.state.backend_postcode_indices}
-        selected_postcode_data= {this.state.selected_postcode_data}
+        postcode_data= {this.state.postcode_data}
+        mouseover_postcode = {this.mouseover_postcode}
+        selected_postcode = {this.state.selected_postcode_index}
         select_postcode = {this.select_postcode }
-        postcode_data_min= {this.state.postcode_data_min}
-        postcode_data_max= {this.state.postcode_data_max}
-        postcode_data_stride = {this.state.postcode_data_stride}
+        highlight_postcode = {this.state.mouseover_postcode_index}
       />
       <div className="RHS">
-        {this.state.backend_thresholds &&
+        {this.state.postcode_data &&
         <UserInterface 
             className="UserInterface" 
             display_data_options = {this.state.display_data_options}
@@ -122,11 +122,18 @@ class App extends React.Component {
             display_pop_options = {this.state.display_pop_options}
             display_pop_index = {this.state.display_pop_index}
             display_pop_callback = {this.display_pop_callback}
+            postcode_data = {this.state.postcode_data}
             display_timespan = {this.state.display_timespan}
-            display_timespan_min = {this.state.backend_thresholds[0]}
-            display_timespan_max = {this.state.backend_thresholds[this.state.backend_thresholds.length-1]}
-            display_timespan_step = {this.state.backend_thresholds[1]-this.state.backend_thresholds[0]}
             display_timespan_callback = {this.display_timespan_callback}
+        />
+        }
+        {this.state.postcode_data &&
+        <PostcodeInfo
+            className="test" 
+            postcode_index = {this.state.mouseover_postcode_index}
+            uk_geojson = {this.state.uk_geojson}
+            postcode_names = {this.state.postcode_names}
+            postcode_data = {this.state.postcode_data}
         />
         }
         <div className="DetailedView">
@@ -146,7 +153,8 @@ class App extends React.Component {
   get_postcode_data(display_data_index, selected_postcode_index, display_pop_index) {
     const display_data = this.state.display_data_options[display_data_index];
     const display_pop = this.state.display_pop_options[display_pop_index];
-    const url = this.state.backend_api[selected_postcode_index].data[display_pop][display_data];
+    const backend_index = this.state.postcode_data.get_backend_index(selected_postcode_index);
+    const url = this.state.backend_api[backend_index].data[display_pop][display_data];
     axios.get(url,{
       responseType: 'arraybuffer',
       headers: {
@@ -159,13 +167,9 @@ class App extends React.Component {
         // get rid of nans
         const floats = floats_tmp.map((i) => i || 0);
 
-        const min = Math.min(...floats);
-        const max = Math.max(...floats);
-
-        this.setState({
-          selected_postcode_data: floats,
-          postcode_data_min: min,
-          postcode_data_max: max 
+        this.setState(prevState => {
+            prevState.postcode_data.set_data(floats);
+           return {postcode_data: prevState.postcode_data}
         });
       })
       .catch(function(error) {
@@ -178,6 +182,12 @@ class App extends React.Component {
       selected_postcode_index: postcode_index 
     });
     this.get_postcode_data(this.state.display_data_index, postcode_index, this.state.display_pop_index);
+  };
+
+  mouseover_postcode = (postcode_index) => {
+    this.setState({
+      mouseover_postcode_index: postcode_index 
+    });
   };
 
   display_data_callback = (event) => {

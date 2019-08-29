@@ -30,6 +30,21 @@
 .UserInterface {
 }
 
+
+.PostcodeInfo {
+  margin-top: 50%;
+  padding-top: 100%;
+  position: relative;
+}
+
+.PostcodeInfoCard {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
 .DetailedView {
 }
 
