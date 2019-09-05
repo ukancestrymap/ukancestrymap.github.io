@@ -37,7 +37,6 @@ class UkMap extends React.Component {
 
   render() {
 
-
     var postcodes;
     if (this.props.uk_geojson && this.props.postcode_data.has_data()) {
 
