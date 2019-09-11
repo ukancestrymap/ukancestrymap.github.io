@@ -16,8 +16,20 @@
   padding-right: 50px;
 }
 
+
+.UkMapContainer {
+  width: 100%; 
+  overflow: hidden;
+}
+
 .UkMap {
-  width: 60%;
+  float: right;
+}
+
+
+.ColorSlider {
+  width: 60px; 
+  float: left;
 }
 
 .RHS {

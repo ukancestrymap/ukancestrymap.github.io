@@ -8,6 +8,8 @@ class Data {
     this.upper_index = 0;
     this.lower_weight = 0.0;
     this.upper_weight = 0.0;
+    this.data_min = 0.0;
+    this.data_max = [0.9,1.0];
   }
 
   set_data(data) {
@@ -20,7 +22,10 @@ class Data {
     return this.data_min;
   }
   max() {
-    return this.data_max;
+    return this.data_max[1];
+  }
+  second_max() {
+    return this.data_max[0];
   }
 
   has_data() {
@@ -58,7 +63,7 @@ class Data {
           }
         }
       }
-      this.data_max = max[0];
+      this.data_max = max;
       this.data_min = min;
     }
   }

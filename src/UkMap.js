@@ -10,7 +10,6 @@ import {
 } from 'd3-scale'
 
 
-
 class UkMap extends React.Component {
   constructor(props) {
     super(props);
@@ -41,12 +40,10 @@ class UkMap extends React.Component {
     if (this.props.uk_geojson && this.props.postcode_data.has_data()) {
 
       // color scale
-      const myColor = scaleLinear().domain([this.props.postcode_data.min(), this
-        .props
-        .postcode_data.max()
-      ]).range(["white",
-        "blue"
-      ]);
+      const myColor = scaleLinear().domain(
+        [this.props.color_range[0],
+          this.props.color_range[1]
+        ]).range(["white", "blue"]);
 
       const projection = geoAlbers()
         .center([5, 54.4])
@@ -84,13 +81,15 @@ class UkMap extends React.Component {
       });
     }
 
-    return <svg 
+    return (
+      <svg 
             ref={element => this.svg_ref = element}
             className='UkMap' 
             width={"100%"} 
             height={"100%"}>
             {postcodes}
            </svg>
+    );
   }
 }
 export default UkMap

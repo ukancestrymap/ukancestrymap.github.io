@@ -34,6 +34,7 @@ class App extends React.Component {
         display_pop_index: 0,
         display_pop_options: null,
         display_timespan: 10,
+        color_range: [0,1],
       };
 
       var uk_topojson = json("uk-postcode-area.json");
@@ -111,6 +112,7 @@ class App extends React.Component {
         selected_postcode = {this.state.selected_postcode_index}
         select_postcode = {this.select_postcode }
         highlight_postcode = {this.state.mouseover_postcode_index}
+        color_range = {this.state.color_range}
       />
       <div className="RHS">
         {this.state.postcode_data &&
@@ -125,11 +127,12 @@ class App extends React.Component {
             postcode_data = {this.state.postcode_data}
             display_timespan = {this.state.display_timespan}
             display_timespan_callback = {this.display_timespan_callback}
+            color_range_callback = {this.color_range_callback}
+            color_range = {this.state.color_range}
         />
         }
         {this.state.postcode_data &&
         <PostcodeInfo
-            className="test" 
             postcode_index = {this.state.mouseover_postcode_index}
             uk_geojson = {this.state.uk_geojson}
             postcode_names = {this.state.postcode_names}
@@ -169,7 +172,11 @@ class App extends React.Component {
 
         this.setState(prevState => {
             prevState.postcode_data.set_data(floats);
-           return {postcode_data: prevState.postcode_data}
+           return {
+             postcode_data: prevState.postcode_data,
+             color_range: [prevState.postcode_data.min(), 
+                           prevState.postcode_data.second_max()]
+           }
         });
       })
       .catch(function(error) {
@@ -210,6 +217,12 @@ class App extends React.Component {
   display_timespan_callback = (value) => {
     this.setState({
       display_timespan: value,
+    });
+  };
+
+  color_range_callback = (range) => {
+    this.setState({
+      color_range: range,
     });
   };
 
