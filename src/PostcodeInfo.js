@@ -1,5 +1,6 @@
 import React from 'react'
 import './App.css'
+import postcode_info from './postcode_info.js'
 import {
   geoAlbers,
   geoCentroid,
@@ -8,7 +9,7 @@ import {
 
 
 import {
-  H5,
+  H6,
   Card,
   Elevation,
 } from "@blueprintjs/core";
@@ -42,16 +43,30 @@ class PostcodeInfo extends React.Component {
   render() {
 
 
-    var postcode_path;
-    var postcode_name;
-    var postcode_data;
+    let to_postcode_path;
+    let to_postcode_name;
+    let to_postcode_name_long;
+    let to_postcode_samples;
+    let postcode_data;
+
+    let from_postcode_name;
+    let from_postcode_name_long;
+    let from_postcode_samples;
     if (this.props.uk_geojson && this.props.postcode_data.has_data()) {
 
       postcode_data = this.props.postcode_data.get_data(this.props.postcode_index);
       // generate postcode paths
       const postcode_geo = this.props.uk_geojson.features[this.props
         .postcode_index];
-      postcode_name = postcode_geo.id;
+      to_postcode_name = postcode_geo.id;
+      const to_postcode_info = postcode_info[to_postcode_name]
+      to_postcode_name_long = to_postcode_info.name;
+      to_postcode_samples = to_postcode_info.samples[this.props.display_data_options]
+
+      from_postcode_name = this.props.postcode_names[this.props.selected_postcode]
+      const from_postcode_info = postcode_info[from_postcode_name]
+      from_postcode_name_long = from_postcode_info.name;
+      from_postcode_samples = from_postcode_info.samples[this.props.display_data_options]
 
       var center = geoCentroid(postcode_geo);
       // Compute the angular distance between bound corners
@@ -67,7 +82,7 @@ class PostcodeInfo extends React.Component {
       const pathGenerator = geoPath().projection(projection);
 
 
-      postcode_path = <path
+      to_postcode_path = <path
         key = {'path' + this.props.postcode_index}
         d = {pathGenerator(postcode_geo)}
         stroke={ 'rgba(0,0,0,0.5)' }
@@ -80,13 +95,14 @@ class PostcodeInfo extends React.Component {
     return (
       <div className='PostcodeInfo'>
       <Card className='PostcodeInfoCard' interactive={false} elevation={Elevation.ZERO}>
-          <H5>{postcode_name}</H5>
-          <H5>{postcode_data}</H5>
+          <H6>({from_postcode_name} - {from_postcode_name_long})</H6>
+          <H6>->({to_postcode_name} -   {to_postcode_name_long})</H6>
+          <H6>{postcode_data}</H6>
           <svg 
             ref={element => this.svg_ref = element}
             width={"100%"} 
             height={"100%"}>
-            {postcode_path}
+            {to_postcode_path}
            </svg>
       </Card>
       </div>

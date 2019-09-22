@@ -34,7 +34,8 @@ class App extends React.Component {
         display_pop_index: 0,
         display_pop_options: null,
         display_timespan: 10,
-        color_range: [0,1],
+        color_range: [0, 1],
+        threshold_scale: 30,
       };
 
       var uk_topojson = json("uk-postcode-area.json");
@@ -129,14 +130,20 @@ class App extends React.Component {
             display_timespan_callback = {this.display_timespan_callback}
             color_range_callback = {this.color_range_callback}
             color_range = {this.state.color_range}
+            select_postcode = {this.select_postcode_name}
+            postcode_names = {this.state.postcode_names}
+            selected_postcode = {this.state.selected_postcode_index}
+            threshold_scale = {this.state.threshold_scale}
         />
         }
         {this.state.postcode_data &&
         <PostcodeInfo
+            selected_postcode = {this.state.selected_postcode_index}
             postcode_index = {this.state.mouseover_postcode_index}
             uk_geojson = {this.state.uk_geojson}
             postcode_names = {this.state.postcode_names}
             postcode_data = {this.state.postcode_data}
+            display_data_options = {this.state.display_data_options}
         />
         }
         <div className="DetailedView">
@@ -184,6 +191,16 @@ class App extends React.Component {
       });
   }
 
+  select_postcode_name = (postcode_name) => {
+    const postcode_index = this.state.postcode_names.findIndex(x => x===postcode_name) 
+    if (postcode_index > -1) {
+      this.setState({
+        selected_postcode_index: postcode_index 
+      });
+      this.get_postcode_data(this.state.display_data_index, postcode_index, this.state.display_pop_index);
+    } 
+  }
+
   select_postcode = (postcode_index) => {
     this.setState({
       selected_postcode_index: postcode_index 
@@ -216,7 +233,7 @@ class App extends React.Component {
 
   display_timespan_callback = (value) => {
     this.setState({
-      display_timespan: value,
+      display_timespan: value/this.state.threshold_scale,
     });
   };
 
