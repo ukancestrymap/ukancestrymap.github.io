@@ -15,6 +15,27 @@ import {
 } from "@blueprintjs/core";
 
 
+class TopHistogram extends React.Component {
+
+  render() {
+
+    var first_n = [];
+    const minHeap = new Heap((a, b) => b[0] - a[0]);
+    for (i = 0; i < this.props.top_n; ++i) {
+      first_n[i] = [this.props.postcode_data.get_data(i), i];
+    }
+    minHeap.init(first_n)
+    for (i = this.props.top_n; i < this.props.postcode_data.length(); ++i) {
+      minHeap.push([i, this.props.postcode_data.get_data(i)]);
+      minHeap.pop();
+    }
+
+
+
+  }
+}
+
+
 
 class PostcodeInfo extends React.Component {
   constructor(props) {
@@ -41,7 +62,6 @@ class PostcodeInfo extends React.Component {
   }
 
   render() {
-
 
     let to_postcode_path;
     let to_postcode_name;
@@ -98,6 +118,9 @@ class PostcodeInfo extends React.Component {
           <H6>({from_postcode_name} - {from_postcode_name_long})</H6>
           <H6>->({to_postcode_name} -   {to_postcode_name_long})</H6>
           <H6>{postcode_data}</H6>
+          <TopHistogram 
+            data={this.props.postcode_data}
+          />
           <svg 
             ref={element => this.svg_ref = element}
             width={"100%"} 
