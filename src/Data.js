@@ -32,6 +32,10 @@ class Data {
     return (this.backend_data != null);
   }
 
+  length() {
+    return this.index_map.length;
+  }
+
   set_threshold(threshold) {
     this.current_threshold = threshold;
     this.upper_index = this.thresholds.findIndex((i) => i > threshold);

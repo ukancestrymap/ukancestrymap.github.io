@@ -63,6 +63,9 @@ class UkMap extends React.Component {
         const stroke_width =
           i === this.props.highlight_postcode ||
           i === this.props.selected_postcode ? 2.5 : 1;
+        const stroke_color = 
+          i === this.props.highlight_postcode ||
+          i === this.props.selected_postcode ? 'red' : 'rgba(0,0,0,0.5)';
         if (!isNaN(color)) {
           return <path
                   key = {'path' + i}
@@ -70,7 +73,7 @@ class UkMap extends React.Component {
                   fill={ myColor(color) }
                   onClick={ (event) => {this.props.select_postcode(i);} }
                   onMouseOver={ (event) => {this.props.mouseover_postcode(i);} }
-                  stroke={ 'rgba(0,0,0,0.5)' }
+                  stroke={stroke_color}
                   strokeWidth={stroke_width}
                   className = 'postcodes'
                  />;

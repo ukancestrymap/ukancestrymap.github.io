@@ -1,6 +1,14 @@
 import React from 'react'
 import './App.css'
 import postcode_info from './postcode_info.js'
+
+import '../node_modules/react-vis/dist/style.css';
+import {
+  XYPlot,
+  XAxis,
+  YAxis,
+  VerticalBarSeries
+} from 'react-vis';
 import {
   geoAlbers,
   geoCentroid,
@@ -19,22 +27,40 @@ class TopHistogram extends React.Component {
 
   render() {
 
-    var first_n = [];
-    const minHeap = new Heap((a, b) => b[0] - a[0]);
-    for (i = 0; i < this.props.top_n; ++i) {
-      first_n[i] = [this.props.postcode_data.get_data(i), i];
+    let data = [];
+    for (let i = 0; i < this.props.data.length(); ++i) {
+      data.push({data: this.props.data.get_data(i), name: this.props.names[i]});
     }
-    minHeap.init(first_n)
-    for (i = this.props.top_n; i < this.props.postcode_data.length(); ++i) {
-      minHeap.push([i, this.props.postcode_data.get_data(i)]);
-      minHeap.pop();
-    }
+    data.sort((a, b) => b.data - a.data);
+    const remove_top_n = 1;
+    const first_n = data.slice(remove_top_n,this.props.top_n)
 
+    let bar_chart_data = first_n.map(
+      function(d, i) {
+        return {
+          x: i,
+          y: d.data
+        };
+      }
+    );
 
+    return (
+      <XYPlot height={200} width={300}>
+      <VerticalBarSeries 
+        data={bar_chart_data} 
+        color={'blue'}
+      />
 
+      <XAxis 
+        tickValues={[...Array(this.props.top_n-remove_top_n).keys()]} 
+        tickFormat={(v) => data[v+remove_top_n].name}
+      />
+      <YAxis
+      />
+      </XYPlot>
+    )
   }
 }
-
 
 
 class PostcodeInfo extends React.Component {
@@ -69,24 +95,28 @@ class PostcodeInfo extends React.Component {
     let to_postcode_samples;
     let postcode_data;
 
+    let from_postcode_data;
     let from_postcode_name;
     let from_postcode_name_long;
     let from_postcode_samples;
     if (this.props.uk_geojson && this.props.postcode_data.has_data()) {
 
-      postcode_data = this.props.postcode_data.get_data(this.props.postcode_index);
+      postcode_data = this.props.postcode_data.get_data(this.props.postcode_index).toPrecision(2);
       // generate postcode paths
       const postcode_geo = this.props.uk_geojson.features[this.props
         .postcode_index];
       to_postcode_name = postcode_geo.id;
       const to_postcode_info = postcode_info[to_postcode_name]
       to_postcode_name_long = to_postcode_info.name;
-      to_postcode_samples = to_postcode_info.samples[this.props.display_data_options]
+      to_postcode_samples = to_postcode_info.samples[this.props
+        .display_data_options]
 
+      from_postcode_data = this.props.postcode_data.get_data(this.props.selected_postcode).toPrecision(2);
       from_postcode_name = this.props.postcode_names[this.props.selected_postcode]
       const from_postcode_info = postcode_info[from_postcode_name]
       from_postcode_name_long = from_postcode_info.name;
-      from_postcode_samples = from_postcode_info.samples[this.props.display_data_options]
+      from_postcode_samples = from_postcode_info.samples[this.props
+        .display_data_options]
 
       var center = geoCentroid(postcode_geo);
       // Compute the angular distance between bound corners
@@ -115,16 +145,21 @@ class PostcodeInfo extends React.Component {
     return (
       <div className='PostcodeInfo'>
       <Card className='PostcodeInfoCard' interactive={false} elevation={Elevation.ZERO}>
-          <H6>({from_postcode_name} - {from_postcode_name_long})</H6>
-          <H6>->({to_postcode_name} -   {to_postcode_name_long})</H6>
-          <H6>{postcode_data}</H6>
+          <H6>{from_postcode_name} - {from_postcode_name_long}</H6> 
+          <H6>Top 10 postcodes</H6>
+          {this.props.postcode_data.has_data() &&
           <TopHistogram 
             data={this.props.postcode_data}
+            names={this.props.postcode_names}
+            top_n={10}
           />
+          }
+          <H6>Between {from_postcode_name} and {from_postcode_name}: {from_postcode_data}</H6>
+          <H6>Between {from_postcode_name} and {to_postcode_name}: {postcode_data}</H6>
           <svg 
             ref={element => this.svg_ref = element}
             width={"100%"} 
-            height={"100%"}>
+            height={"40%"}>
             {to_postcode_path}
            </svg>
       </Card>
