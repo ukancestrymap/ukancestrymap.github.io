@@ -7,6 +7,7 @@ import {
   Card,
   Elevation,
   Slider,
+  Checkbox,
   HTMLSelect,
   H5,
   Popover,
@@ -38,6 +39,7 @@ class Help extends React.Component {
 
 class Options extends React.Component {
   render() {
+      console.log(`value = ${this.props.value}`);
     return (
       <div className="options-row">
           <div className="options-column1">
@@ -49,6 +51,7 @@ class Options extends React.Component {
               fill={true}
               options={this.props.options}
               onChange={this.props.onChange}
+              value={this.props.options[this.props.value]}
           />
           <Help className="options-column3" string={this.props.longHelperText}/>
           </div>
@@ -63,6 +66,7 @@ class UserInterface extends React.Component {
     this.state = {
       editing_postcode: false,
       editing_postcode_text: "",
+      advanced: false,
     };
   }
 
@@ -95,8 +99,8 @@ class UserInterface extends React.Component {
       postcode_name = this.props.postcode_names[this.props.selected_postcode]
     }
 
-    return (
-      <Card interactive={false} elevation={Elevation.TWO}>
+    const standard = (
+          <div>
           <H5>Display Options</H5>
           <Options 
             helperText="some more info here..."
@@ -104,6 +108,7 @@ class UserInterface extends React.Component {
             labelFor="dataset-input"
             options={population_options} 
             onChange={this.props.display_pop_callback}
+            value={this.props.display_pop_index}
             longHelperText="extra info here..."
           />
           <Options
@@ -112,6 +117,7 @@ class UserInterface extends React.Component {
             labelFor="datatype-input"
             options={data_options} 
             onChange={this.props.display_data_callback}
+            value={this.props.display_data_index}
             longHelperText="extra info here..."
           />
           <FormGroup
@@ -150,11 +156,24 @@ class UserInterface extends React.Component {
             }}
           />
           </FormGroup>
+          </div>
+    );
+
+    const advanced = (
+          <div>
           <FormGroup
             helperText="select the range of colors to display in the map"
             label="Color Range"
             labelFor="color-range-input"
           >
+          <Options 
+            label="Mode"
+            labelFor="mode-input"
+            options={["second largest", "95% percentiles", "set by user"]} 
+            onChange={this.props.color_range_mode_callback}
+            value={this.props.color_range_mode}
+            longHelperText="extra info here..."
+          />
           <RangeSlider 
               id="color-range-input"
               min={data_min}
@@ -163,11 +182,42 @@ class UserInterface extends React.Component {
               labelStepSize={data_step}
               value = {data_range}
               labelPrecision = {2}
+              disabled = {this.props.color_range_mode !== 2}
               onChange = {this.props.color_range_callback}
           />
           </FormGroup>
+          <FormGroup
+            helperText="use this URL to save your current parameters"
+            label="Copy parameters"
+            labelFor="parameter-input"
+          >
+          <InputGroup
+            id="parameter-input"
+            leftIcon="bookmark"
+            readOnly={true}
+            value={this.props.parameters_string}
+          />
+          </FormGroup>
+          </div>
+    );
+
+    return (
+      <Card interactive={false} elevation={Elevation.TWO}>
+      {standard}
+      <Checkbox 
+        checked={this.state.advanced} 
+        label="Show advanced" 
+        onChange={this.handleAndvancedChange} 
+      />
+      {this.state.advanced && advanced}
       </Card>
     )
   }
+
+  handleAndvancedChange = () => {
+    this.setState({
+      advanced: !this.state.advanced
+    });
+  };
 }
 export default UserInterface

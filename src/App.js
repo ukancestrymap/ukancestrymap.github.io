@@ -1,10 +1,15 @@
 import React from 'react';
 import axios from 'axios';
+import {
+  withRouter
+} from 'react-router-dom';
+import queryString from 'query-string';
 import './App.css';
 import UkMap from './UkMap.js';
 import UserInterface from './UserInterface.js';
 import PostcodeInfo from './PostcodeInfo.js';
 import Data from './Data.js';
+
 
 import {
   json
@@ -21,6 +26,7 @@ axios.defaults.baseURL = 'http://localhost:5000'
 class App extends React.Component {
     constructor(props) {
       super(props)
+
       this.state = {
         uk_geojson: null,
         backend_api: null,
@@ -35,8 +41,43 @@ class App extends React.Component {
         display_pop_options: null,
         display_timespan: 10,
         color_range: [0, 1],
+        color_range_mode: 1,
         threshold_scale: 30,
       };
+
+      if (this.props.location.search) {
+        const loaded_parameters = queryString.parse(this.props.location.search);
+        console.log(loaded_parameters);
+        const parseParamInt = (param, def) => {
+          if (!param) {
+            return def;
+          }
+          return parseInt(param);
+        }
+        const parseParamArray = (param, def) => {
+          if (!param) {
+            return def;
+          }
+          return param.map(parseFloat);
+        }
+        this.state.selected_postcode_index = parseParamInt(
+          loaded_parameters.selected_postcode_index,
+          this.state.selected_postcode_index);
+        this.state.display_data_index = parseParamInt(loaded_parameters
+          .display_data_index,
+          this.state.display_data_index);
+        this.state.display_pop_index = parseParamInt(loaded_parameters
+          .display_pop_index,
+          this.state.display_pop_index);
+        this.state.display_timespan = parseParamInt(loaded_parameters
+          .display_timespan,
+          this.state.display_timespan);
+        this.state.color_range = parseParamArray(loaded_parameters.color_range,
+          this.state.color_range);
+        this.state.color_range_mode = parseParamInt(loaded_parameters
+          .color_range_mode,
+          this.state.color_range_mode);
+      }
 
       var uk_topojson = json("uk-postcode-area.json");
       var backend_api = this.get_postcode_api();
@@ -97,9 +138,31 @@ class App extends React.Component {
       window.removeEventListener("resize", this.updateDimensions.bind(this));
     }
     render() {
-        if (this.state.postcode_data) {
-          this.state.postcode_data.set_threshold(this.state.display_timespan);
-        }
+        //console.log(`params are ${this.props.location}`);
+        //console.log(this.props.location);
+        //console.log(window.location.href);
+        //let parameters_string = ""
+        //if (this.props.location.search) {
+        //  parameters_string = this.props.location
+        //}
+        console.log(`fixed = ${this.state.color_range_mode}`);
+        const saved_parameters = {
+          selected_postcode_index: this.state.selected_postcode_index,
+          display_data_index: this.state.display_data_index,
+          display_pop_index: this.state.display_pop_index,
+          display_timespan: this.state.display_timespan,
+          color_range: this.state.color_range,
+          color_range_mode: this.state.color_range_mode,
+        };
+
+        const parameters_string = [
+          window.location.protocol,
+          '//',
+          window.location.host,
+          window.location.pathname,
+          '?',
+          queryString.stringify(saved_parameters),
+        ].join('');
 
         return (
             <div className="App" ref={element => this.div_ref = element}>
@@ -134,6 +197,9 @@ class App extends React.Component {
             postcode_names = {this.state.postcode_names}
             selected_postcode = {this.state.selected_postcode_index}
             threshold_scale = {this.state.threshold_scale}
+            parameters_string = {parameters_string}
+            color_range_mode = {this.state.color_range_mode}
+            color_range_mode_callback = {this.color_range_mode_callback}
         />
         }
         {this.state.postcode_data &&
@@ -179,10 +245,13 @@ class App extends React.Component {
 
         this.setState(prevState => {
             prevState.postcode_data.set_data(floats);
-           return {
+            prevState.postcode_data.set_threshold(prevState.display_timespan);
+            let color_range = this.set_color_range(prevState.color_range_mode,
+                                                   prevState.color_range,
+                                                   prevState.postcode_data);
+            return {
              postcode_data: prevState.postcode_data,
-             color_range: [prevState.postcode_data.min(), 
-                           prevState.postcode_data.second_max()]
+             color_range: color_range,
            }
         });
       })
@@ -232,8 +301,16 @@ class App extends React.Component {
 
 
   display_timespan_callback = (value) => {
-    this.setState({
-      display_timespan: value/this.state.threshold_scale,
+    const threshold = value/this.state.threshold_scale;
+    this.setState(prevState => {
+        prevState.postcode_data.set_threshold(threshold);
+        let color_range = this.set_color_range(prevState.color_range_mode,
+                                               prevState.color_range,
+                                               prevState.postcode_data);
+        return {
+         display_timespan: threshold,
+         color_range: color_range,
+       }
     });
   };
 
@@ -243,6 +320,35 @@ class App extends React.Component {
     });
   };
 
+  set_color_range = (mode, prev_color_range, data) => {
+    let color_range = prev_color_range;
+    console.log(`min = ${data.min()}, second_max = ${data.second_max()}`);
+    if (mode === 0) {
+      color_range = [data.min(), 
+                     data.second_max()];
+    } else if (mode === 1) {
+      color_range = [
+                  data.sorted_data[Math.round(data.sorted_data.length*0.05)], 
+                  data.sorted_data[Math.round(data.sorted_data.length*0.95)], 
+      ];
+    }
+    return color_range;
+  };
+
+  color_range_mode_callback = (event) => {
+    const value = event.currentTarget.selectedIndex;
+    this.setState(prevState => {
+            let color_range = this.set_color_range(value,
+                                                   prevState.color_range,
+                                                   prevState.postcode_data);
+            return {
+             color_range_mode: value,
+             color_range: color_range,
+           }
+        });
+  };
+
+
 }
 
-export default App;
+export default withRouter(App);

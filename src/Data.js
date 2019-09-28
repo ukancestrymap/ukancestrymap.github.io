@@ -8,8 +8,7 @@ class Data {
     this.upper_index = 0;
     this.lower_weight = 0.0;
     this.upper_weight = 0.0;
-    this.data_min = 0.0;
-    this.data_max = [0.9,1.0];
+    this.sorted_data = new Array(index_map.length);
   }
 
   set_data(data) {
@@ -19,13 +18,15 @@ class Data {
   }
 
   min() {
-    return this.data_min;
+    return this.sorted_data[0];
   }
+
   max() {
-    return this.data_max[1];
+    return this.sorted_data[this.sorted_data.length-1];
   }
+
   second_max() {
-    return this.data_max[0];
+    return this.sorted_data[this.sorted_data.length-2];
   }
 
   has_data() {
@@ -52,23 +53,12 @@ class Data {
     }
     this.upper_weight = 1 - this.lower_weight;
 
-    // get min - max for current threshold
+    // get sorted data for this threshold
     if (this.has_data()) {
-      var min = 1000.0;
-      var max = [0.0, 0.0];
       for (var i = 0; i < this.index_map.length; i++) {
-        const data = this.get_data(i);
-        min = Math.min(data, min);
-        if (data > max[0]) {
-          if (data > max[1]) {
-            max[1] = data;
-          } else {
-            max[0] = data;
-          }
-        }
+        this.sorted_data[i] = this.get_data(i);
       }
-      this.data_max = max;
-      this.data_min = min;
+      this.sorted_data.sort();
     }
   }
 
