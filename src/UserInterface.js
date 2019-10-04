@@ -81,7 +81,9 @@ class UserInterface extends React.Component {
     const data_min = this.props.postcode_data.min();
     const data_max = this.props.postcode_data.max();
     const data_step = (data_max - data_min) / 4.0;
+    console.log(`data = [${data_min}, ${data_max}, ${data_step}]`);
     let data_range = this.props.color_range
+    console.log(`data_range = [${data_range}]`);
     if (data_range[0] < data_min) {
       data_range[0] = data_min;
     }

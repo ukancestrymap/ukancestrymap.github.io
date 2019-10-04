@@ -36,7 +36,7 @@ class UkMap extends React.Component {
 
   render() {
 
-    var postcodes;
+    var postcodes, selected_postcode, highlight_postcode;
     if (this.props.uk_geojson && this.props.postcode_data.has_data()) {
 
       // color scale
@@ -59,13 +59,7 @@ class UkMap extends React.Component {
 
       // generate postcode paths
       postcodes = this.props.uk_geojson.features.map((d, i) => {
-        const color = this.props.postcode_data.get_data(i);
-        const stroke_width =
-          i === this.props.highlight_postcode ||
-          i === this.props.selected_postcode ? 2.5 : 1;
-        const stroke_color = 
-          i === this.props.highlight_postcode ||
-          i === this.props.selected_postcode ? 'red' : 'rgba(0,0,0,0.5)';
+        const color = this.props.postcode_data.get_data(i).mean;
         if (!isNaN(color)) {
           return <path
                   key = {'path' + i}
@@ -73,8 +67,8 @@ class UkMap extends React.Component {
                   fill={ myColor(color) }
                   onClick={ (event) => {this.props.select_postcode(i);} }
                   onMouseOver={ (event) => {this.props.mouseover_postcode(i);} }
-                  stroke={stroke_color}
-                  strokeWidth={stroke_width}
+                  stroke={'rgba(0,0,0,0.5)'}
+                  strokeWidth={1}
                   className = 'postcodes'
                  />;
         } else {
@@ -82,6 +76,33 @@ class UkMap extends React.Component {
         }
 
       });
+
+      highlight_postcode = this.props.uk_geojson.features.filter((d, i) => {
+          return i === this.props.highlight_postcode
+      }).map((d) => {
+          return <path
+                  key = {'highlight path'}
+                  d = {pathGenerator(d)}
+                  fill = {'none'}
+                  stroke={'green'}
+                  strokeWidth={2.5}
+                  className = 'postcodes'
+                 />;
+      });
+ 
+      selected_postcode = this.props.uk_geojson.features.filter((d, i) => {
+          return i === this.props.selected_postcode
+      }).map((d) => {
+          return <path
+                  key = {'selected postcode'}
+                  d = {pathGenerator(d)}
+                  fill = {'none'}
+                  stroke={'red'}
+                  strokeWidth={2.5}
+                  className = 'postcodes'
+                 />;
+      });
+
     }
 
     return (
@@ -91,6 +112,8 @@ class UkMap extends React.Component {
             width={"100%"} 
             height={"100%"}>
             {postcodes}
+            {highlight_postcode}
+            {selected_postcode}
            </svg>
     );
   }

@@ -328,8 +328,8 @@ class App extends React.Component {
                      data.second_max()];
     } else if (mode === 1) {
       color_range = [
-                  data.sorted_data[Math.round(data.sorted_data.length*0.05)], 
-                  data.sorted_data[Math.round(data.sorted_data.length*0.95)], 
+                  data.sorted_data[Math.round(data.sorted_data.length*0.05)].mean, 
+                  data.sorted_data[Math.round(data.sorted_data.length*0.95)].mean, 
       ];
     }
     return color_range;

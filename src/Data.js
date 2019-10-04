@@ -18,15 +18,15 @@ class Data {
   }
 
   min() {
-    return this.sorted_data[0];
+    return this.has_data() ? this.sorted_data[0].mean : 0.0;
   }
 
   max() {
-    return this.sorted_data[this.sorted_data.length-1];
+    return this.has_data() ? this.sorted_data[this.sorted_data.length-1].mean : 1.0;
   }
 
   second_max() {
-    return this.sorted_data[this.sorted_data.length-2];
+    return this.has_data() ? this.sorted_data[this.sorted_data.length-2].mean : 1.0;
   }
 
   has_data() {
@@ -58,7 +58,7 @@ class Data {
       for (var i = 0; i < this.index_map.length; i++) {
         this.sorted_data[i] = this.get_data(i);
       }
-      this.sorted_data.sort();
+      this.sorted_data.sort((a, b) => a.mean - b.mean);
     }
   }
 
@@ -67,17 +67,28 @@ class Data {
   }
 
   get_data(i) {
+    const number_of_stats = 3;
     const backend_index = this.index_map[i];
     if (backend_index >= 0) {
-      const row_index = this.data_stride *
+      const row_index = number_of_stats * this.data_stride *
         backend_index;
-      const upper_data = this.backend_data[row_index + this.upper_index];
+      const data_index = row_index + number_of_stats * this.upper_index;
+      const upper_data = this.backend_data.slice(data_index, data_index+3);
       var data;
       if (this.lower_weight > 0) {
-        const lower_data = this.backend_data[row_index + this.upper_index - 1];
-        data = upper_data * this.upper_weight + lower_data * this.lower_weight;
+        const lower_data_index = row_index + number_of_stats* (this.upper_index - 1);
+        const lower_data = this.backend_data.slice(lower_data_index, lower_data_index+3);
+        data = {
+          lower_95: upper_data[0] * this.upper_weight + lower_data[0] * this.lower_weight, 
+          mean: upper_data[1] * this.upper_weight + lower_data[1] * this.lower_weight, 
+          upper_95: upper_data[2] * this.upper_weight + lower_data[2] * this.lower_weight,
+        }
       } else {
-        data = upper_data;
+        data = {
+          lower_95: upper_data[0], 
+          mean: upper_data[1], 
+          upper_95: upper_data[2]
+        }
       }
       return data;
     } else {

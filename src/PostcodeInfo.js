@@ -7,7 +7,8 @@ import {
   XYPlot,
   XAxis,
   YAxis,
-  VerticalBarSeries
+  VerticalBarSeries,
+  VerticalRectSeries,
 } from 'react-vis';
 import {
   geoAlbers,
@@ -31,23 +32,43 @@ class TopHistogram extends React.Component {
     for (let i = 0; i < this.props.data.length(); ++i) {
       data.push({data: this.props.data.get_data(i), name: this.props.names[i]});
     }
-    data.sort((a, b) => b.data - a.data);
+    data.sort((a, b) => b.data.mean - a.data.mean);
     const remove_top_n = 1;
     const first_n = data.slice(remove_top_n,this.props.top_n)
+
+    let bar_chart_data_range = first_n.map(
+      function(d, i) {
+        return {
+          x0: i-0.42,
+          x: i+0.42,
+          y0: d.data.lower_95,
+          y: d.data.upper_95,
+        };
+      }
+    );
 
     let bar_chart_data = first_n.map(
       function(d, i) {
         return {
           x: i,
-          y: d.data
+          y: d.data.mean,
         };
       }
     );
 
     return (
-      <XYPlot height={200} width={300}>
+      <XYPlot 
+        height={200} 
+        width={this.props.width} 
+        margin={{left: 50}}
+      >
       <VerticalBarSeries 
         data={bar_chart_data} 
+        color={'blue'}
+        opacity={0.5}
+      />
+      <VerticalRectSeries 
+        data={bar_chart_data_range} 
         color={'blue'}
       />
 
@@ -56,6 +77,7 @@ class TopHistogram extends React.Component {
         tickFormat={(v) => data[v+remove_top_n].name}
       />
       <YAxis
+        //tickFormat={(v) => v.toFixed(2)}
       />
       </XYPlot>
     )
@@ -74,8 +96,8 @@ class PostcodeInfo extends React.Component {
 
   updateDimensions = () => {
     this.setState({
-      height: this.svg_ref.clientHeight,
-      width: this.svg_ref.clientWidth
+      height: this.div_ref.clientHeight,
+      width: this.div_ref.clientWidth
     });
   };
 
@@ -101,7 +123,7 @@ class PostcodeInfo extends React.Component {
     let from_postcode_samples;
     if (this.props.uk_geojson && this.props.postcode_data.has_data()) {
 
-      postcode_data = this.props.postcode_data.get_data(this.props.postcode_index).toPrecision(2);
+      postcode_data = this.props.postcode_data.get_data(this.props.postcode_index).mean.toPrecision(2);
       // generate postcode paths
       const postcode_geo = this.props.uk_geojson.features[this.props
         .postcode_index];
@@ -111,7 +133,7 @@ class PostcodeInfo extends React.Component {
       to_postcode_samples = to_postcode_info.samples[this.props
         .display_data_options]
 
-      from_postcode_data = this.props.postcode_data.get_data(this.props.selected_postcode).toPrecision(2);
+      from_postcode_data = this.props.postcode_data.get_data(this.props.selected_postcode).mean.toPrecision(2);
       from_postcode_name = this.props.postcode_names[this.props.selected_postcode]
       const from_postcode_info = postcode_info[from_postcode_name]
       from_postcode_name_long = from_postcode_info.name;
@@ -142,26 +164,37 @@ class PostcodeInfo extends React.Component {
       />;
     }
 
+    const show_hover_postcode = false;
+
+    let from_postcode_colored = (<span style={{color: "red"}}>{from_postcode_name}</span>)
+    let to_postcode_colored = (<span style={{color: "green"}}>{to_postcode_name}</span>)
+
     return (
-      <div className='PostcodeInfo'>
+      <div 
+        className='PostcodeInfo'
+        ref={element => this.div_ref = element}
+      >
       <Card className='PostcodeInfoCard' interactive={false} elevation={Elevation.ZERO}>
-          <H6>{from_postcode_name} - {from_postcode_name_long}</H6> 
+          <H6>{from_postcode_colored} - {from_postcode_name_long}</H6> 
           <H6>Top 10 postcodes</H6>
           {this.props.postcode_data.has_data() &&
           <TopHistogram 
             data={this.props.postcode_data}
             names={this.props.postcode_names}
+            width={0.9*this.state.width}
             top_n={10}
           />
           }
-          <H6>Between {from_postcode_name} and {from_postcode_name}: {from_postcode_data}</H6>
-          <H6>Between {from_postcode_name} and {to_postcode_name}: {postcode_data}</H6>
+          <H6>Between {from_postcode_colored} and {from_postcode_colored}: {from_postcode_data}</H6>
+          <H6>Between {from_postcode_colored} and {to_postcode_colored}: {postcode_data}</H6>
+          {show_hover_postcode &&
           <svg 
             ref={element => this.svg_ref = element}
             width={"100%"} 
             height={"40%"}>
             {to_postcode_path}
            </svg>
+          }
       </Card>
       </div>
     );

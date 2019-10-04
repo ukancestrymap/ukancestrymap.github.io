@@ -11,7 +11,7 @@
   max-width: 1400px; /* Will be AT MOST 320px wide */
   margin-right: auto; margin-left: auto;
   justify-content: center;
-  padding-top: 50px;
+  padding-top: 20px;
   padding-left: 50px;
   padding-right: 50px;
 }
@@ -55,7 +55,7 @@
   left: 0;
   bottom: 0;
   right: 0;
-  height: 600px
+  height: 340px
 }
 
 .DetailedView {
