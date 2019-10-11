@@ -1,9 +1,9 @@
 class Data {
-  constructor(index_map, thresholds, data_stride) {
+  constructor(index_map) {
     this.backend_data = null;
     this.index_map = index_map;
-    this.thresholds = thresholds;
-    this.data_stride = thresholds.length;
+    this.thresholds = null;
+    this.data_stride = 0;
     this.current_threshold = 0;
     this.upper_index = 0;
     this.lower_weight = 0.0;
@@ -11,8 +11,11 @@ class Data {
     this.sorted_data = new Array(index_map.length);
   }
 
-  set_data(data) {
+  set_data(data, thresholds) {
     this.backend_data = data;
+    this.thresholds = thresholds;
+    this.data_stride = thresholds.length;
+    console.log(`data_stride = ${this.data_stride}`);
     //this.data_min = Math.min(...data);
     //this.data_max = Math.max(...data);
   }
@@ -37,8 +40,14 @@ class Data {
     return this.index_map.length;
   }
 
+  get_thresholds() {
+    return this.has_data() ? this.thresholds : [0, 1, 2];
+  }
+
   set_threshold(threshold) {
-    this.current_threshold = threshold;
+    if (!this.has_data()) {
+      return
+    }
     this.upper_index = this.thresholds.findIndex((i) => i > threshold);
     if (this.upper_index === -1) {
       this.upper_index = this.thresholds.length - 1;

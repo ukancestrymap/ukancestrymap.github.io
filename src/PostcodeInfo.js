@@ -115,15 +115,15 @@ class PostcodeInfo extends React.Component {
     let to_postcode_name;
     let to_postcode_name_long;
     let to_postcode_samples;
-    let postcode_data;
+    let postcode_data = {lower_95: 0.0, mean: 0.0, upper_95: 0.0};
 
-    let from_postcode_data;
+    let from_postcode_data = postcode_data;
     let from_postcode_name;
     let from_postcode_name_long;
     let from_postcode_samples;
     if (this.props.uk_geojson && this.props.postcode_data.has_data()) {
 
-      postcode_data = this.props.postcode_data.get_data(this.props.postcode_index).mean.toPrecision(2);
+      postcode_data = this.props.postcode_data.get_data(this.props.postcode_index);
       // generate postcode paths
       const postcode_geo = this.props.uk_geojson.features[this.props
         .postcode_index];
@@ -133,7 +133,7 @@ class PostcodeInfo extends React.Component {
       to_postcode_samples = to_postcode_info.samples[this.props
         .display_data_options]
 
-      from_postcode_data = this.props.postcode_data.get_data(this.props.selected_postcode).mean.toPrecision(2);
+      from_postcode_data = this.props.postcode_data.get_data(this.props.selected_postcode);
       from_postcode_name = this.props.postcode_names[this.props.selected_postcode]
       const from_postcode_info = postcode_info[from_postcode_name]
       from_postcode_name_long = from_postcode_info.name;
@@ -185,8 +185,10 @@ class PostcodeInfo extends React.Component {
             top_n={10}
           />
           }
-          <H6>Between {from_postcode_colored} and {from_postcode_colored}: {from_postcode_data}</H6>
-          <H6>Between {from_postcode_colored} and {to_postcode_colored}: {postcode_data}</H6>
+          <H6>Between {from_postcode_colored} and {from_postcode_colored}: 
+              [{from_postcode_data.lower_95.toPrecision(2)}, {from_postcode_data.mean.toPrecision(2)}, {from_postcode_data.upper_95.toPrecision(2)}]</H6>
+          <H6>Between {from_postcode_colored} and {to_postcode_colored}: 
+              [{postcode_data.lower_95.toPrecision(2)}, {postcode_data.mean.toPrecision(2)}, {postcode_data.upper_95.toPrecision(2)}]</H6>
           {show_hover_postcode &&
           <svg 
             ref={element => this.svg_ref = element}

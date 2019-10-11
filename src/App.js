@@ -42,7 +42,8 @@ class App extends React.Component {
         display_timespan: 10,
         color_range: [0, 1],
         color_range_mode: 1,
-        threshold_scale: 30,
+        threshold_scale: [30, 1],
+        backend_thresholds: null,
       };
 
       if (this.props.location.search) {
@@ -85,8 +86,11 @@ class App extends React.Component {
         const uk_topojson = values[0];
         const backend_api = values[1].data.postcodes;
         const display_pop_options = Object.keys(backend_api[0].data);
-        const pop = display_pop_options[this.state.display_pop_index];
-        const display_data_options = Object.keys(backend_api[0].data[pop]);
+        let display_data_options = []
+        for (let pop of display_pop_options) {
+          const options = Object.keys(backend_api[0].data[pop]);
+          display_data_options.push(options);
+        }
         const backend_thresholds = values[1].data.thresholds;
         const names_json = uk_topojson.objects['uk-postcode-area'].geometries.map(
           i => i.id);
@@ -101,6 +105,7 @@ class App extends React.Component {
           display_data_options: display_data_options,
           display_pop_options: display_pop_options,
           postcode_data: new Data(indicies, backend_thresholds),
+          backend_thresholds: backend_thresholds,
         });
       }).then(() => {
         this.get_postcode_data(this.state.display_data_index, this.state
@@ -182,7 +187,7 @@ class App extends React.Component {
         {this.state.postcode_data &&
         <UserInterface 
             className="UserInterface" 
-            display_data_options = {this.state.display_data_options}
+            display_data_options = {this.state.display_data_options[this.state.display_pop_index]}
             display_data_index = {this.state.display_data_index}
             display_data_callback = {this.display_data_callback}
             display_pop_options = {this.state.display_pop_options}
@@ -196,7 +201,7 @@ class App extends React.Component {
             select_postcode = {this.select_postcode_name}
             postcode_names = {this.state.postcode_names}
             selected_postcode = {this.state.selected_postcode_index}
-            threshold_scale = {this.state.threshold_scale}
+            threshold_scale = {this.state.threshold_scale[this.state.display_pop_index]}
             parameters_string = {parameters_string}
             color_range_mode = {this.state.color_range_mode}
             color_range_mode_callback = {this.color_range_mode_callback}
@@ -209,7 +214,7 @@ class App extends React.Component {
             uk_geojson = {this.state.uk_geojson}
             postcode_names = {this.state.postcode_names}
             postcode_data = {this.state.postcode_data}
-            display_data_options = {this.state.display_data_options}
+            display_data_options = {this.state.display_data_options[this.state.display_pop_index]}
         />
         }
         <div className="DetailedView">
@@ -227,7 +232,7 @@ class App extends React.Component {
 
 
   get_postcode_data(display_data_index, selected_postcode_index, display_pop_index) {
-    const display_data = this.state.display_data_options[display_data_index];
+    const display_data = this.state.display_data_options[display_pop_index][display_data_index];
     const display_pop = this.state.display_pop_options[display_pop_index];
     const backend_index = this.state.postcode_data.get_backend_index(selected_postcode_index);
     const url = this.state.backend_api[backend_index].data[display_pop][display_data];
@@ -244,7 +249,7 @@ class App extends React.Component {
         const floats = floats_tmp.map((i) => i || 0);
 
         this.setState(prevState => {
-            prevState.postcode_data.set_data(floats);
+            prevState.postcode_data.set_data(floats, prevState.backend_thresholds[display_pop]);
             prevState.postcode_data.set_threshold(prevState.display_timespan);
             let color_range = this.set_color_range(prevState.color_range_mode,
                                                    prevState.color_range,
@@ -293,15 +298,23 @@ class App extends React.Component {
 
   display_pop_callback = (event) => {
     const value = event.currentTarget.selectedIndex;
+
+    // if pop index changing reset data index
+    let display_data_index = this.state.display_data_index;
+    if (value !== this.state.display_pop_index) {
+      display_data_index = 0;
+    }
+
     this.setState({
-      display_pop_index: value
+      display_pop_index: value,
+      display_data_index: display_data_index, 
     });
-    this.get_postcode_data(this.state.display_data_index, this.state.selected_postcode_index, value);
+    this.get_postcode_data(display_data_index, this.state.selected_postcode_index, value);
   };
 
 
   display_timespan_callback = (value) => {
-    const threshold = value/this.state.threshold_scale;
+    const threshold = value/this.state.threshold_scale[this.state.display_pop_index];
     this.setState(prevState => {
         prevState.postcode_data.set_threshold(threshold);
         let color_range = this.set_color_range(prevState.color_range_mode,

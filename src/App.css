@@ -90,6 +90,14 @@
   margin-bottom: 10px;
 }
 
+.Overlay {
+  margin: auto;
+  width: 300px;
+  padding: 10px;
+  padding-top: 50px;
+  text-align: center;
+}
+
 .options-column1 {
   width: 100px;
   vertical-align: middle;

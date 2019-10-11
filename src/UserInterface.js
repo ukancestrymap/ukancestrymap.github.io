@@ -3,13 +3,15 @@ import './App.css'
 import {
   FormGroup,
   RangeSlider,
+  Button,
+  Overlay,
   InputGroup,
   Card,
   Elevation,
   Slider,
   Checkbox,
   HTMLSelect,
-  H5,
+  H5, H3,
   Popover,
   Icon,
   Intent,
@@ -17,13 +19,14 @@ import {
 
 
 const display_pop_map = {
-  "all": "entire population",
-  "white": "white british",
+  "IBD": "IBD",
+  "fN": "fN",
 }
 
 const display_data_map = {
   "ibd_segments": "number of ancestors",
   "genome_fraction": "percent shared genome",
+  "mutations": "mutations",
 }
 
 class Help extends React.Component {
@@ -39,7 +42,7 @@ class Help extends React.Component {
 
 class Options extends React.Component {
   render() {
-      console.log(`value = ${this.props.value}`);
+    console.log(`value = ${this.props.value}`);
     return (
       <div className="options-row">
           <div className="options-column1">
@@ -67,23 +70,27 @@ class UserInterface extends React.Component {
       editing_postcode: false,
       editing_postcode_text: "",
       advanced: false,
+      more_information: false,
     };
   }
 
 
   render() {
-    const thresholds = this.props.postcode_data.thresholds.map(x => this.props.threshold_scale*x)
-    const selected_threshold = this.props.threshold_scale*this.props.display_timespan
+    const thresholds = this.props.postcode_data.get_thresholds().map(x => this.props
+      .threshold_scale * x)
+    const selected_threshold = this.props.threshold_scale * this.props
+      .display_timespan
     const thresholds_min = thresholds[0];
     const thresholds_length = thresholds.length;
     const thresholds_max = thresholds[thresholds_length - 1];
-    const thresholds_step = thresholds[1] - thresholds_min;
+    const thresholds_step = Math.round((thresholds_max - thresholds_min) / 5);
+    console.log(
+      `thresh = ${selected_threshold} thresholds_min = ${thresholds_min}, max = ${thresholds_max} threshold_step = ${thresholds_step}`
+      );
     const data_min = this.props.postcode_data.min();
     const data_max = this.props.postcode_data.max();
     const data_step = (data_max - data_min) / 4.0;
-    console.log(`data = [${data_min}, ${data_max}, ${data_step}]`);
     let data_range = this.props.color_range
-    console.log(`data_range = [${data_range}]`);
     if (data_range[0] < data_min) {
       data_range[0] = data_min;
     }
@@ -102,7 +109,7 @@ class UserInterface extends React.Component {
     }
 
     const standard = (
-          <div>
+      <div>
           <H5>Display Options</H5>
           <Options 
             helperText="some more info here..."
@@ -162,7 +169,7 @@ class UserInterface extends React.Component {
     );
 
     const advanced = (
-          <div>
+      <div>
           <FormGroup
             helperText="select the range of colors to display in the map"
             label="Color Range"
@@ -212,6 +219,14 @@ class UserInterface extends React.Component {
         onChange={this.handleAndvancedChange} 
       />
       {this.state.advanced && advanced}
+      <Button text="More Information" intent="primary" onClick={this.createOverlayHandler('more_information')} />
+      <Overlay className="Overlay" isOpen={this.state.more_information}>
+        <Card interactive={false} elevation={Elevation.TWO}>
+        <H3>More Information</H3>
+        <p>TODO: more information here about the visualisation</p>
+        <Button text="Close" onClick={this.createOverlayHandler('more_information')} />
+        </Card>
+      </Overlay>
       </Card>
     )
   }
@@ -221,5 +236,13 @@ class UserInterface extends React.Component {
       advanced: !this.state.advanced
     });
   };
+
+  createOverlayHandler(toggle) {
+    return () => {
+      this.setState({
+        [toggle]: !this.state[toggle]
+      });
+    };
+  }
 }
 export default UserInterface
