@@ -4,7 +4,7 @@
 // line shows in the panel; the full credits open in a dialog, as the Open
 // Government Licence lets the attribution be linked rather than always shown.
 
-import { dataUrl, mapLicenceUrl } from '../content/links'
+import { dataUrl, mapLicenceUrl, paperUrl } from '../content/links'
 import { useCopy } from '../content/useCopy'
 import { LinkedText } from './LinkedText'
 import { Button } from './ui/button'
@@ -58,6 +58,13 @@ export function Credits() {
             <div className="flex flex-col gap-3">
               <p>{copy.credits.copyright}</p>
               <p>{copy.credits.developers}</p>
+              <p>
+                <LinkedText
+                  text={copy.credits.paper}
+                  link={copy.credits.paperLink}
+                  href={paperUrl}
+                />
+              </p>
               <p>
                 <LinkedText
                   text={copy.credits.data}

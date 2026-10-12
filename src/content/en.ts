@@ -249,6 +249,10 @@ export interface Copy {
     readonly copyright: string
     /** The people who made the site. */
     readonly developers: string
+    /** Cites the published paper; `{link}` marks where {@link Copy.credits.paperLink} goes. */
+    readonly paper: string
+    /** The paper's DOI, linked to it. */
+    readonly paperLink: string
     /** Cites the dataset; `{link}` marks where {@link Copy.credits.dataLink} goes. */
     readonly data: string
     /** The dataset's DOI, linked to it. */
@@ -514,6 +518,8 @@ export const en: Copy = {
     copyright: '© 2019-2026 University of Oxford.',
     developers:
       'Developed by Fergus Cooper, Martin Robinson, Juba Nait Saada and Pier Palamara.',
+    paper: 'Paper: {link}.',
+    paperLink: 'doi:10.1038/s41467-020-19588-x',
     data: 'Data: {link}, licensed under CC BY 4.0.',
     dataLink: 'doi:10.5281/zenodo.4012677',
     map: [
