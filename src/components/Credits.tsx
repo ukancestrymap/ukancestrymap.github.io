@@ -4,7 +4,7 @@
 // line shows in the panel; the full credits open in a dialog, as the Open
 // Government Licence lets the attribution be linked rather than always shown.
 
-import { dataUrl, mapLicenceUrl } from '../content/links'
+import { dataUrl, mapLicenceUrl, paperUrl } from '../content/links'
 import { useCopy } from '../content/useCopy'
 import { LinkedText } from './LinkedText'
 import { Button } from './ui/button'
@@ -28,53 +28,69 @@ export function Credits() {
   return (
     <footer className="flex items-center justify-between gap-2 border-t pt-4 text-xs text-muted-foreground">
       <p>{copy.credits.copyright}</p>
-      <Dialog>
-        <DialogTrigger
-          render={
-            <Button
-              variant="ghost"
-              size="xs"
-              className="text-muted-foreground"
-            />
-          }
+      <div className="flex items-center gap-1">
+        {/* The accessibility statement, a page of its own. */}
+        <a
+          href={`${import.meta.env.BASE_URL}accessibility/`}
+          className="px-2 underline-offset-4 hover:text-foreground hover:underline"
         >
-          {copy.credits.open}
-        </DialogTrigger>
-        <DialogContent
-          closeLabel={copy.info.close}
-          className="max-h-[85dvh] overflow-y-auto sm:max-w-lg"
-        >
-          <DialogHeader>
-            <DialogTitle>{copy.credits.title}</DialogTitle>
-          </DialogHeader>
-          <div className="flex flex-col gap-3">
-            <p>{copy.credits.copyright}</p>
-            <p>{copy.credits.developers}</p>
-            <p>
-              <LinkedText
-                text={copy.credits.data}
-                link={copy.credits.dataLink}
-                href={dataUrl}
+          {copy.statement.link}
+        </a>
+        <Dialog>
+          <DialogTrigger
+            render={
+              <Button
+                variant="ghost"
+                size="xs"
+                className="text-muted-foreground"
               />
-            </p>
-            <p>
-              {copy.credits.map.map((line) => (
-                <span key={line} className="block">
-                  {line}
-                </span>
-              ))}
-            </p>
-            <p>
-              <LinkedText
-                text={copy.credits.mapLicence}
-                link={copy.credits.mapLicenceLink}
-                href={mapLicenceUrl}
-              />
-            </p>
-          </div>
-          <DialogFooter showCloseButton closeLabel={copy.info.close} />
-        </DialogContent>
-      </Dialog>
+            }
+          >
+            {copy.credits.open}
+          </DialogTrigger>
+          <DialogContent
+            closeLabel={copy.info.close}
+            className="max-h-[85dvh] overflow-y-auto sm:max-w-lg"
+          >
+            <DialogHeader>
+              <DialogTitle>{copy.credits.title}</DialogTitle>
+            </DialogHeader>
+            <div className="flex flex-col gap-3">
+              <p>{copy.credits.copyright}</p>
+              <p>{copy.credits.developers}</p>
+              <p>
+                <LinkedText
+                  text={copy.credits.paper}
+                  link={copy.credits.paperLink}
+                  href={paperUrl}
+                />
+              </p>
+              <p>
+                <LinkedText
+                  text={copy.credits.data}
+                  link={copy.credits.dataLink}
+                  href={dataUrl}
+                />
+              </p>
+              <p>
+                {copy.credits.map.map((line) => (
+                  <span key={line} className="block">
+                    {line}
+                  </span>
+                ))}
+              </p>
+              <p>
+                <LinkedText
+                  text={copy.credits.mapLicence}
+                  link={copy.credits.mapLicenceLink}
+                  href={mapLicenceUrl}
+                />
+              </p>
+            </div>
+            <DialogFooter showCloseButton closeLabel={copy.info.close} />
+          </DialogContent>
+        </Dialog>
+      </div>
     </footer>
   )
 }

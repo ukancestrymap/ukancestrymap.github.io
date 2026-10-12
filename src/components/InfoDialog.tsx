@@ -3,7 +3,7 @@
 // the map that used to be the dataset selector's help text.
 
 import { useCopy } from '../content/useCopy'
-import { paperUrl } from '../content/links'
+import { feedbackIssueUrl, paperUrl } from '../content/links'
 import { LinkedText } from './LinkedText'
 import { Button } from './ui/button'
 import {
@@ -37,7 +37,13 @@ export function InfoDialog() {
         <div className="flex flex-col gap-3">
           <p>{copy.info.overview}</p>
           <p>{copy.info.about}</p>
-          <p>{copy.info.feedback}</p>
+          <p>
+            <LinkedText
+              text={copy.info.feedback}
+              link={copy.info.feedbackLink}
+              href={feedbackIssueUrl}
+            />
+          </p>
           <p>
             <LinkedText
               text={copy.info.paper}
@@ -45,7 +51,6 @@ export function InfoDialog() {
               href={paperUrl}
             />
           </p>
-          <p>{copy.info.contact}</p>
         </div>
         <DialogFooter showCloseButton closeLabel={copy.info.close} />
       </DialogContent>

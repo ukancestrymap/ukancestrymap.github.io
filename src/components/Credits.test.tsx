@@ -2,7 +2,7 @@ import { expect, it } from 'vitest'
 import { page, userEvent } from 'vitest/browser'
 import { render } from 'vitest-browser-react'
 import { en } from '../content/en'
-import { dataUrl, mapLicenceUrl } from '../content/links'
+import { dataUrl, mapLicenceUrl, paperUrl } from '../content/links'
 import { Credits } from './Credits'
 
 async function openCredits() {
@@ -24,9 +24,25 @@ it('shows only the copyright line and a button in the panel', async () => {
     .not.toBeInTheDocument()
 })
 
+it('links to the accessibility statement', async () => {
+  const screen = await render(<Credits />)
+  await expect
+    .element(screen.getByRole('link', { name: en.statement.link }))
+    .toHaveAttribute('href', `${import.meta.env.BASE_URL}accessibility/`)
+})
+
 it('shows the developers in the dialog', async () => {
   const dialog = await openCredits()
   await expect.element(dialog.getByText(en.credits.developers)).toBeVisible()
+})
+
+it('links to the published paper by its DOI, within its sentence', async () => {
+  const dialog = await openCredits()
+  const link = dialog.getByRole('link', { name: en.credits.paperLink })
+  await expect.element(link).toHaveAttribute('href', paperUrl)
+  expect(link.element().parentElement?.textContent).toBe(
+    en.credits.paper.replace('{link}', en.credits.paperLink),
+  )
 })
 
 it('links to the dataset by its DOI, within its sentence', async () => {

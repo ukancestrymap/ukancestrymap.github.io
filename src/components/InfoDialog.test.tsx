@@ -2,7 +2,7 @@ import { expect, it } from 'vitest'
 import { page, userEvent } from 'vitest/browser'
 import { render } from 'vitest-browser-react'
 import { en } from '../content/en'
-import { paperUrl } from '../content/links'
+import { feedbackIssueUrl, paperUrl } from '../content/links'
 import { InfoDialog } from './InfoDialog'
 
 async function openDialog() {
@@ -22,7 +22,6 @@ it('explains the map and who made it', async () => {
   const dialog = await openDialog()
   await expect.element(dialog.getByText(en.info.overview)).toBeVisible()
   await expect.element(dialog.getByText(en.info.about)).toBeVisible()
-  await expect.element(dialog.getByText(en.info.contact)).toBeVisible()
 })
 
 it('links to the paper', async () => {
@@ -30,6 +29,13 @@ it('links to the paper', async () => {
   await expect
     .element(dialog.getByRole('link', { name: en.info.paperLink }))
     .toHaveAttribute('href', paperUrl)
+})
+
+it('invites feedback through GitHub', async () => {
+  const dialog = await openDialog()
+  await expect
+    .element(dialog.getByRole('link', { name: en.info.feedbackLink }))
+    .toHaveAttribute('href', feedbackIssueUrl)
 })
 
 it.each([

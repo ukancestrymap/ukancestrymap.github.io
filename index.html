@@ -5,25 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>%APP_TITLE%</title>
-    <script>
-      // Shows the dark theme before the page is first drawn, if chosen or set
-      // on the device, so it never flashes white while the app loads. Repeats
-      // src/lib/theme.ts, which takes over once the app runs; keep them in step.
-      ;(() => {
-        let stored = null
-        try {
-          stored = localStorage.getItem('theme')
-        } catch {
-          // Storage unavailable: follow the device.
-        }
-        const dark =
-          stored === 'dark' ||
-          (stored !== 'light' &&
-            matchMedia('(prefers-color-scheme: dark)').matches)
-        document.documentElement.classList.toggle('dark', dark)
-        document.documentElement.style.colorScheme = dark ? 'dark' : 'light'
-      })()
-    </script>
   </head>
   <body>
     <div id="root"></div>

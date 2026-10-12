@@ -1,0 +1,20 @@
+# Linked from the site's "More information" dialog (src/content/links.ts).
+name: Feedback, a bug or an idea
+description: Something wrong on the site, a suggestion, or a pattern you noticed in the data.
+body:
+  - type: textarea
+    id: feedback
+    attributes:
+      label: What would you like to tell us?
+    validations:
+      required: true
+  - type: input
+    id: view
+    attributes:
+      label: Link to the view
+      description: If it is about a particular view of the map, paste the link from "Copy parameters" under "Show advanced".
+  - type: textarea
+    id: setup
+    attributes:
+      label: What were you using?
+      description: For a bug, your device and browser.

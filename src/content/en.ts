@@ -234,14 +234,14 @@ export interface Copy {
     readonly overview: string
     /** Who made the site, and the data it shows. */
     readonly about: string
-    /** An invitation to send feedback. */
+    /** An invitation to send feedback; `{link}` marks where {@link Copy.info.feedbackLink} goes. */
     readonly feedback: string
+    /** The feedback form, linked. */
+    readonly feedbackLink: string
     /** Points to the paper; `{link}` marks where {@link Copy.info.paperLink} goes. */
     readonly paper: string
     /** The paper's citation, linked to it. */
     readonly paperLink: string
-    /** How to get in touch. */
-    readonly contact: string
   }
   /** The credits at the foot of the side panel. */
   readonly credits: {
@@ -249,6 +249,10 @@ export interface Copy {
     readonly copyright: string
     /** The people who made the site. */
     readonly developers: string
+    /** Cites the published paper; `{link}` marks where {@link Copy.credits.paperLink} goes. */
+    readonly paper: string
+    /** The paper's DOI, linked to it. */
+    readonly paperLink: string
     /** Cites the dataset; `{link}` marks where {@link Copy.credits.dataLink} goes. */
     readonly data: string
     /** The dataset's DOI, linked to it. */
@@ -263,6 +267,51 @@ export interface Copy {
     readonly open: string
     /** Title of the full credits' dialog. */
     readonly title: string
+  }
+  /** The accessibility statement, a page of its own. */
+  readonly statement: {
+    /** The page's title in the browser tab. */
+    readonly pageTitle: string
+    /** The footer's link to the page. */
+    readonly link: string
+    /** The link back to the map. */
+    readonly back: string
+    /** The page's heading. */
+    readonly heading: string
+    /** What the statement covers and who maintains the site. */
+    readonly intro: string
+    /** Introduces the list of what people should be able to do. */
+    readonly ableTo: string
+    /** What people should be able to do. */
+    readonly abilities: readonly string[]
+    /** Heading of the known limitations. */
+    readonly limitationsHeading: string
+    /** The known limitations. */
+    readonly limitations: readonly string[]
+    /** Heading of how to report a problem. */
+    readonly reportingHeading: string
+    /** How to report a problem; `{link}` marks where {@link Copy.statement.reportLink} goes. */
+    readonly reporting: string
+    /** The accessibility issue form, linked. */
+    readonly reportLink: string
+    /** What reporting needs, and what to expect. */
+    readonly reportingNote: string
+    /** Heading of the technical information. */
+    readonly technicalHeading: string
+    /** The standard aimed at; `{link}` marks where {@link Copy.statement.standardLink} goes. */
+    readonly technical: string
+    /** The standard's name, linked. */
+    readonly standardLink: string
+    /** Heading of how the site was tested. */
+    readonly testingHeading: string
+    /** Introduces the list of automated checks. */
+    readonly testingIntro: string
+    /** The automated checks. */
+    readonly tests: readonly string[]
+    /** The checks made by hand. */
+    readonly testingByHand: string
+    /** When the statement was prepared. */
+    readonly prepared: string
   }
   /** Explanations shown in the help popovers. */
   readonly help: {
@@ -459,17 +508,18 @@ export const en: Copy = {
       'The data reflects genetic relatedness in the past 1,500 years among samples from the UK Biobank data set, which contains the genomes of about 500,000 donors from the UK.',
     ),
     feedback:
-      'We welcome feedback, bug reports, and comments on patterns reflecting historical or demographic events you may find in the data.',
+      'We welcome feedback, bug reports, and comments on patterns reflecting historical or demographic events you may find in the data: please {link}.',
+    feedbackLink: 'open an issue on GitHub',
     paper: 'Additional details on the analysis are in {link}.',
     paperLink: 'Nait Saada et al., Nature Communications 11, 6130 (2020)',
-    contact:
-      'To contact us, please write to Pier using <lastnamelowercase>@stats.ox.ac.uk.',
   },
 
   credits: {
     copyright: '© 2019-2026 University of Oxford.',
     developers:
       'Developed by Fergus Cooper, Martin Robinson, Juba Nait Saada and Pier Palamara.',
+    paper: 'Paper: {link}.',
+    paperLink: 'doi:10.1038/s41467-020-19588-x',
     data: 'Data: {link}, licensed under CC BY 4.0.',
     dataLink: 'doi:10.5281/zenodo.4012677',
     map: [
@@ -482,6 +532,59 @@ export const en: Copy = {
     mapLicenceLink: 'Open Government Licence',
     open: 'Credits',
     title: 'Credits',
+  },
+
+  statement: {
+    pageTitle: 'Accessibility statement: UK Ancestry Map',
+    link: 'Accessibility',
+    back: 'Back to the map',
+    heading: 'Accessibility statement',
+    intro: sentences(
+      'This statement covers the UK Ancestry Map.',
+      'The map is a research project, maintained by the people who developed it.',
+    ),
+    ableTo:
+      'We want as many people as possible to be able to use it. For example, you should be able to:',
+    abilities: [
+      'use the whole site, the map included, with a keyboard alone',
+      'use it on a touch screen: tap an area to compare it, and tap it again to select it',
+      'zoom in to 400% without losing content, and use it on a narrow phone screen',
+      'read every value without the map, in the table that "Show all values" opens',
+      'choose a light or dark theme, or follow your device',
+      "use your device's high-contrast colours, and turn off animation",
+      "tell the map's colours apart with the commonest kinds of colour blindness",
+    ],
+    limitationsHeading: 'Known limitations',
+    limitations: [
+      'Many postcode areas, especially in London, are small when the whole map is shown. Zoom in with the buttons on the map, the mouse wheel or by pinching, or choose an area in the "Postcode area" box.',
+      'The map shows how related areas are by colour. The same values are written in the details beside the map and in the table that "Show all values" opens.',
+      'We have not yet tested the site by hand with screen readers, such as NVDA or VoiceOver.',
+      'The site is only available in English.',
+    ],
+    reportingHeading: 'Reporting a problem',
+    reporting:
+      'If anything on the site is hard to use, or you cannot use it at all, please {link}. It helps to say what you were trying to do, and which device, browser and any assistive technology you used.',
+    reportLink: 'report it on GitHub',
+    reportingNote: sentences(
+      'Reporting needs a free GitHub account.',
+      'We read every report, but as a research project we cannot promise how soon we will reply.',
+    ),
+    technicalHeading: 'Technical information',
+    technical: sentences(
+      'We aim to meet the {link} at level AA.',
+      'The site has not been audited independently, so we cannot say for certain that it does; the limitations we know of are listed above.',
+    ),
+    standardLink: 'Web Content Accessibility Guidelines (WCAG), version 2.2',
+    testingHeading: 'How we tested the site',
+    testingIntro: 'Automated checks run whenever the site changes:',
+    tests: [
+      'the axe-core accessibility checker, applying the WCAG 2.2 level A and AA rules in the light and dark themes and with high-contrast colours',
+      'checks that the page fits a narrow screen, keeps all its text with wider letter, word and line spacing, and does not animate when less motion is asked for',
+      'tests that the map works with a keyboard and on a touch screen, and that its colours keep enough contrast, and stay in order with simulated colour blindness',
+    ],
+    testingByHand:
+      'The developers also checked the site by hand, with a keyboard and in desktop browsers.',
+    prepared: 'This statement was prepared on 12 October 2026.',
   },
 
   help: {

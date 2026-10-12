@@ -90,6 +90,12 @@ for (const colorScheme of ['light', 'dark'] as const) {
       expect(await violations(page)).toEqual([])
     })
 
+    test('the accessibility statement', async ({ page }) => {
+      await page.goto('./accessibility/')
+      await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+      expect(await violations(page)).toEqual([])
+    })
+
     test('forced-colours (high contrast) mode', async ({ page }) => {
       await page.emulateMedia({ forcedColors: 'active' })
       expect(await violations(page)).toEqual([])

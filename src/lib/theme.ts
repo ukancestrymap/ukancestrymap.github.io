@@ -1,9 +1,10 @@
 // Choosing between the light and dark themes. New: the original frontend
 // (OxfordRSE/fastsmc_app_frontend) had only a light theme.
 //
-// index.html repeats the logic of readSetting, resolveTheme and applyTheme in a
-// small inline script, which sets the theme before the page is first drawn, so
-// a dark page never flashes white while the app loads. Keep the two in step.
+// src/theme-init.js repeats the logic of readSetting, resolveTheme and
+// applyTheme in a small script inlined into each page, which sets the theme
+// before the page is first drawn, so a dark page never flashes white while the
+// app loads. Keep the two in step.
 
 import type { Theme } from '../components/palette'
 
