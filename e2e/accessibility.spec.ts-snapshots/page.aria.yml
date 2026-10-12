@@ -168,4 +168,6 @@
     - button "Show all values"
     - button "More information"
     - paragraph: /© \d+-\d+ University of Oxford\./
+    - link "Accessibility":
+      - /url: /\/accessibility\/$/
     - button "Credits"

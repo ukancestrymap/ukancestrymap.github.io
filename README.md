@@ -48,6 +48,9 @@ npx playwright install chromium
 ## Accessibility
 
 The site aims to meet [WCAG 2.2](https://www.w3.org/TR/WCAG22/) at level AA.
+Its accessibility statement is a page of its own, at `/accessibility/`, with its text in `src/content/en.ts` under `statement`.
+Keep it in step with changes to the site, including its date and known limitations.
+Visitors report problems through the issue forms in `.github/ISSUE_TEMPLATE/`, which the statement and the "More information" dialog link to.
 Four kinds of check cover it, and the Test and Deploy workflows run the first three on every change.
 
 - **Automated checks of the built site.**

@@ -46,8 +46,23 @@ test('the built site loads and works under its base path', async ({
   expect(problems).toEqual([])
 })
 
-// index.html's inline script sets the theme before the first paint, so a dark
-// page never flashes white. With the app's scripts blocked, only it can act.
+test('the accessibility statement loads under the base path, and links back', async ({
+  page,
+  baseURL,
+}) => {
+  await page.goto('./accessibility/')
+  await expect(page).toHaveTitle(en.statement.pageTitle)
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+    en.statement.heading,
+  )
+  await page.getByRole('link', { name: en.statement.back }).click()
+  await expect(page).toHaveURL(String(baseURL))
+  await expect(page).toHaveTitle(en.appTitle)
+})
+
+// src/theme-init.js, inlined into each page, sets the theme before the first
+// paint, so a dark page never flashes white. With the app's scripts blocked,
+// only it can act.
 test.describe('the theme, before the app runs', () => {
   test.beforeEach(async ({ page }) => {
     await page.route('**/*.{js,ts,tsx}', (route) => route.abort())
@@ -66,6 +81,14 @@ test.describe('the theme, before the app runs', () => {
     await page.emulateMedia({ colorScheme: 'light' })
     await page.goto('./')
     expect(await isDark(page)).toBe(false)
+  })
+
+  test('follows a device set to dark on the accessibility statement too', async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme: 'dark' })
+    await page.goto('./accessibility/')
+    expect(await isDark(page)).toBe(true)
   })
 
   test('shows a stored choice over the device', async ({ page }) => {

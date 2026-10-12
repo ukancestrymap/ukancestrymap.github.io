@@ -24,6 +24,13 @@ it('shows only the copyright line and a button in the panel', async () => {
     .not.toBeInTheDocument()
 })
 
+it('links to the accessibility statement', async () => {
+  const screen = await render(<Credits />)
+  await expect
+    .element(screen.getByRole('link', { name: en.statement.link }))
+    .toHaveAttribute('href', `${import.meta.env.BASE_URL}accessibility/`)
+})
+
 it('shows the developers in the dialog', async () => {
   const dialog = await openCredits()
   await expect.element(dialog.getByText(en.credits.developers)).toBeVisible()

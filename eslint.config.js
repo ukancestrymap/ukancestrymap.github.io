@@ -103,5 +103,10 @@ export default defineConfig([
     extends: [js.configs.recommended, tseslint.configs.disableTypeChecked],
     languageOptions: { globals: globals.node },
   },
+  {
+    // Inlined into each page's head, so it runs in the browser.
+    files: ['src/theme-init.js'],
+    languageOptions: { globals: globals.browser },
+  },
   prettier,
 ])
