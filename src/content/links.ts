@@ -34,3 +34,30 @@ export const feedbackIssueUrl = `${repositoryUrl}/issues/new?template=feedback.y
 
 /** The accessibility standard the site aims to meet. */
 export const wcagUrl = 'https://www.w3.org/TR/WCAG22/'
+
+/** The OxfordRSE Plausible analytics server, which counts the site's visits. */
+export const analyticsOrigin = 'https://plausible-oxrse.fly.dev'
+
+/**
+ * The Plausible analytics script.
+ *
+ * @remarks
+ * Only the Deploy workflow's builds include it (see vite.config.ts), so
+ * development, pull requests and the tests count nothing.
+ */
+export const analyticsScriptUrl = `${analyticsOrigin}/js/script.js`
+
+/** Plausible's script that sizes an embedded dashboard to its content. */
+export const analyticsEmbedScriptUrl = `${analyticsOrigin}/js/embed.host.js`
+
+/**
+ * The site's public dashboard on the analytics server, which the analytics
+ * page embeds: the same statistics the developers see.
+ */
+export const analyticsDashboardUrl = `${analyticsOrigin}/share/ukancestrymap.github.io?auth=1Kv10qOIp8YY_NdfPio4c`
+
+/** Plausible Analytics, the tool that counts the site's visits. */
+export const plausibleUrl = 'https://plausible.io/'
+
+/** Plausible's account of what it collects and why. */
+export const plausibleDataPolicyUrl = 'https://plausible.io/data-policy'

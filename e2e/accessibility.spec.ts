@@ -6,7 +6,7 @@
 // says still need a person to check.
 
 import { AxeBuilder } from '@axe-core/playwright'
-import { expect, type Page, test } from '@playwright/test'
+import { expect, type Page, test } from './fixtures.ts'
 import { en } from '../src/content/en.ts'
 
 const rules = [
@@ -90,11 +90,17 @@ for (const colorScheme of ['light', 'dark'] as const) {
       expect(await violations(page)).toEqual([])
     })
 
-    test('the accessibility statement', async ({ page }) => {
-      await page.goto('./accessibility/')
-      await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
-      expect(await violations(page)).toEqual([])
-    })
+    for (const [name, path] of [
+      ['the accessibility statement', './accessibility/'],
+      ['the privacy policy', './privacy/'],
+      ['the analytics page', './analytics/'],
+    ] as const) {
+      test(name, async ({ page }) => {
+        await page.goto(path)
+        await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+        expect(await violations(page)).toEqual([])
+      })
+    }
 
     test('forced-colours (high contrast) mode', async ({ page }) => {
       await page.emulateMedia({ forcedColors: 'active' })
