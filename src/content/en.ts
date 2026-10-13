@@ -263,10 +263,74 @@ export interface Copy {
     readonly mapLicence: string
     /** The map licence's name, linked to it. */
     readonly mapLicenceLink: string
+    /** Names the footer's links to the site's text pages, for screen readers. */
+    readonly pages: string
     /** Label of the button that opens the full credits. */
     readonly open: string
     /** Title of the full credits' dialog. */
     readonly title: string
+  }
+  /** The privacy policy, a page of its own. */
+  readonly privacy: {
+    /** The page's title in the browser tab. */
+    readonly pageTitle: string
+    /** The footer's link to the page. */
+    readonly link: string
+    /** The page's heading. */
+    readonly heading: string
+    /** Why and how visits are counted. */
+    readonly intro: string
+    /** Heading of what is counted. */
+    readonly countedHeading: string
+    /** What is counted for each visit. */
+    readonly counted: readonly string[]
+    /** Heading of what is not. */
+    readonly notCountedHeading: string
+    /** What is not collected. */
+    readonly notCounted: readonly string[]
+    /** What the site keeps on the visitor's device. */
+    readonly storage: string
+    /** Heading of where to see the statistics. */
+    readonly transparencyHeading: string
+    /** Points to the analytics page; `{link}` marks where {@link Copy.privacy.statisticsLink} goes. */
+    readonly transparency: string
+    /** The analytics page, linked. */
+    readonly statisticsLink: string
+    /** Heading of where to learn more or ask. */
+    readonly moreHeading: string
+    /** Points to Plausible's data policy; `{link}` marks where {@link Copy.privacy.policyLink} goes. */
+    readonly policy: string
+    /** Plausible's data policy, linked. */
+    readonly policyLink: string
+    /** How to ask about privacy; `{link}` marks where {@link Copy.privacy.questionLink} goes. */
+    readonly question: string
+    /** The feedback form, linked. */
+    readonly questionLink: string
+    /** When the page was last updated. */
+    readonly updated: string
+  }
+  /** The analytics page, showing the statistics the developers see. */
+  readonly analytics: {
+    /** The page's title in the browser tab. */
+    readonly pageTitle: string
+    /** The footer's link to the page. */
+    readonly link: string
+    /** The page's heading. */
+    readonly heading: string
+    /** What the page shows; `{link}` marks where {@link Copy.analytics.policyLink} goes. */
+    readonly intro: string
+    /** The privacy policy, linked. */
+    readonly policyLink: string
+    /** Names the embedded statistics for screen readers. */
+    readonly statisticsTitle: string
+    /** Points to the statistics on their own page; `{link}` marks where {@link Copy.analytics.statisticsLink} goes. */
+    readonly elsewhere: string
+    /** The statistics' own page, linked. */
+    readonly statisticsLink: string
+    /** Names the tool; `{link}` marks where {@link Copy.analytics.toolLink} goes. */
+    readonly poweredBy: string
+    /** The tool's name, linked. */
+    readonly toolLink: string
   }
   /** The accessibility statement, a page of its own. */
   readonly statement: {
@@ -530,8 +594,61 @@ export const en: Copy = {
     ],
     mapLicence: 'Map boundaries used under the {link}.',
     mapLicenceLink: 'Open Government Licence',
+    pages: 'About this site',
     open: 'Credits',
     title: 'Credits',
+  },
+
+  privacy: {
+    pageTitle: 'Privacy policy: UK Ancestry Map',
+    link: 'Privacy policy',
+    heading: 'Privacy policy',
+    intro: sentences(
+      'To see how the map is used, we count visits with Plausible Analytics, on a server run by Oxford Research Software Engineering.',
+      'The statistics are anonymous and only ever added up: no one is tracked, and no profile is built of anyone.',
+    ),
+    countedHeading: 'What is counted',
+    counted: [
+      'which page was visited: its address without the settings after the "?", so not which area or settings you looked at',
+      'where the visit came from, such as a search engine or a link on another site',
+      'the type of device, browser and operating system',
+      'the country, region and city the visit came from, worked out from its internet (IP) address',
+      'how long the page was open, and how far down it was scrolled',
+    ],
+    notCountedHeading: 'What is not',
+    notCounted: [
+      'No cookies, and nothing else is stored on your device to count visits.',
+      'No personal data: your IP address is used only to tell visits apart within a day, and is never stored.',
+      'No tracking across sites, and no advertising.',
+    ],
+    storage:
+      'The only thing the site keeps on your device is your choice of colour theme, if you make one, in your browser. It is never sent anywhere.',
+    transparencyHeading: 'Seeing the statistics',
+    transparency: 'The statistics we see are public, on our {link}.',
+    statisticsLink: 'analytics page',
+    moreHeading: 'More information',
+    policy: "Plausible's {link} explains what it collects and why.",
+    policyLink: 'data policy',
+    question:
+      'If you have a question about privacy or analytics, please {link}.',
+    questionLink: 'open an issue on GitHub',
+    updated: 'This policy was last updated on 13 October 2026.',
+  },
+
+  analytics: {
+    pageTitle: 'Analytics: UK Ancestry Map',
+    link: 'Analytics',
+    heading: 'Analytics',
+    intro: sentences(
+      'A transparent view of the statistics available to us: these are the same numbers we see.',
+      'Our {link} explains how they are collected.',
+    ),
+    policyLink: 'privacy policy',
+    statisticsTitle: 'Visit statistics for the UK Ancestry Map',
+    elsewhere: 'If they do not show below, {link}.',
+    statisticsLink: 'open them on their own page',
+    poweredBy: 'Stats powered by {link}.',
+    toolLink: 'Plausible Analytics',
   },
 
   statement: {

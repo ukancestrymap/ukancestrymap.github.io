@@ -5,9 +5,17 @@ import react from '@vitejs/plugin-react'
 import { playwright } from '@vitest/browser-playwright'
 import { defineConfig } from 'vitest/config'
 import { en } from './src/content/en.ts'
+import {
+  analyticsEmbedScriptUrl,
+  analyticsScriptUrl,
+} from './src/content/links.ts'
 
 const escapeHtml = (text: string) =>
   text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
+
+// Set by the Deploy workflow to the site's domain, so only published builds
+// count visits; unset in development, pull requests and local builds.
+const analyticsDomain = process.env.PLAUSIBLE_DOMAIN
 
 const themeInit = readFileSync(
   new URL('src/theme-init.js', import.meta.url),
@@ -16,11 +24,13 @@ const themeInit = readFileSync(
 
 // https://vite.dev/config/
 export default defineConfig({
-  // Set in CI from actions/configure-pages, e.g. '/fastsmc_app_static'; unset locally.
+  // Set in CI from actions/configure-pages: empty for a site at its domain's
+  // root, as now, or '/name' for a GitHub project site; unset locally.
   base: `${process.env.BASE_PATH ?? ''}/`,
   // Import aliases such as "@/" come from tsconfig "paths", so they are defined once.
   resolve: { tsconfigPaths: true },
-  // Two pages: the map, and the accessibility statement at /accessibility/.
+  // Four pages: the map, and the text pages /accessibility/, /privacy/ and
+  // /analytics/.
   // The warning limit is in kB, minified, not gzipped: the code they share
   // (React and Base UI among it) is one chunk of about 400 kB, and the map's
   // own, with its 120 kB of boundaries, another of about 380 kB. The default of
@@ -34,6 +44,10 @@ export default defineConfig({
         accessibility: fileURLToPath(
           new URL('accessibility/index.html', import.meta.url),
         ),
+        privacy: fileURLToPath(new URL('privacy/index.html', import.meta.url)),
+        analytics: fileURLToPath(
+          new URL('analytics/index.html', import.meta.url),
+        ),
       },
     },
   },
@@ -46,13 +60,44 @@ export default defineConfig({
     tailwindcss(),
     {
       // Into every page: its title, which is copy too, from src/content/en.ts;
-      // and the script that sets the theme before the page is first drawn.
+      // the script that sets the theme before the page is first drawn; and, in
+      // published builds, the analytics script. Into the analytics page, also
+      // Plausible's script for its embedded dashboard.
       name: 'page-head',
-      transformIndexHtml: (html) => ({
+      transformIndexHtml: (html, { path }) => ({
         html: html
           .replace('%APP_TITLE%', escapeHtml(en.appTitle))
-          .replace('%STATEMENT_TITLE%', escapeHtml(en.statement.pageTitle)),
-        tags: [{ tag: 'script', children: themeInit, injectTo: 'head' }],
+          .replace('%STATEMENT_TITLE%', escapeHtml(en.statement.pageTitle))
+          .replace('%PRIVACY_TITLE%', escapeHtml(en.privacy.pageTitle))
+          .replace('%ANALYTICS_TITLE%', escapeHtml(en.analytics.pageTitle)),
+        tags: [
+          { tag: 'script', children: themeInit, injectTo: 'head' },
+          // Plausible: cookie-free visit counts, in published builds only.
+          ...(analyticsDomain
+            ? [
+                {
+                  tag: 'script',
+                  attrs: {
+                    defer: true,
+                    'data-domain': analyticsDomain,
+                    src: analyticsScriptUrl,
+                  },
+                  injectTo: 'head' as const,
+                },
+              ]
+            : []),
+          // On the analytics page, Plausible's script that sizes its embedded
+          // dashboard to its content.
+          ...(path === '/analytics/index.html'
+            ? [
+                {
+                  tag: 'script',
+                  attrs: { defer: true, src: analyticsEmbedScriptUrl },
+                  injectTo: 'head' as const,
+                },
+              ]
+            : []),
+        ],
       }),
     },
   ],

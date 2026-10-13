@@ -18,24 +18,22 @@ import {
 } from './ui/dialog'
 
 /**
- * The credits at the foot of the side panel: a copyright line, and a button
- * opening the full credits.
+ * The foot of the side panel: the copyright line with a button opening the
+ * full credits, and links to the site's text pages beneath.
  *
- * @returns The copyright line and the button; the dialog opens over the page.
+ * @returns The footer; the credits' dialog opens over the page.
  */
 export function Credits() {
   const copy = useCopy()
+  const pages = [
+    { label: copy.statement.link, path: 'accessibility/' },
+    { label: copy.privacy.link, path: 'privacy/' },
+    { label: copy.analytics.link, path: 'analytics/' },
+  ]
   return (
-    <footer className="flex items-center justify-between gap-2 border-t pt-4 text-xs text-muted-foreground">
-      <p>{copy.credits.copyright}</p>
-      <div className="flex items-center gap-1">
-        {/* The accessibility statement, a page of its own. */}
-        <a
-          href={`${import.meta.env.BASE_URL}accessibility/`}
-          className="px-2 underline-offset-4 hover:text-foreground hover:underline"
-        >
-          {copy.statement.link}
-        </a>
+    <footer className="flex flex-col gap-1 border-t pt-4 text-xs text-muted-foreground">
+      <div className="flex items-center justify-between gap-2">
+        <p>{copy.credits.copyright}</p>
         <Dialog>
           <DialogTrigger
             render={
@@ -91,6 +89,22 @@ export function Credits() {
           </DialogContent>
         </Dialog>
       </div>
+      {/* The site's text pages, each a page of its own. */}
+      <nav aria-label={copy.credits.pages}>
+        {/* Right-aligned under "Credits", inset by its button's padding (px-2). */}
+        <ul className="flex flex-wrap justify-end gap-x-4 gap-y-1 pr-2">
+          {pages.map(({ label, path }) => (
+            <li key={path}>
+              <a
+                href={`${import.meta.env.BASE_URL}${path}`}
+                className="underline-offset-4 hover:text-foreground hover:underline"
+              >
+                {label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
     </footer>
   )
 }

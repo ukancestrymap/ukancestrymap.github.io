@@ -24,11 +24,19 @@ it('shows only the copyright line and a button in the panel', async () => {
     .not.toBeInTheDocument()
 })
 
-it('links to the accessibility statement', async () => {
+it('links to the text pages beneath the copyright line, in order', async () => {
   const screen = await render(<Credits />)
-  await expect
-    .element(screen.getByRole('link', { name: en.statement.link }))
-    .toHaveAttribute('href', `${import.meta.env.BASE_URL}accessibility/`)
+  const nav = screen.getByRole('navigation', { name: en.credits.pages })
+  const links = nav
+    .getByRole('link')
+    .elements()
+    .map((link) => [link.textContent, link.getAttribute('href')])
+  const base = import.meta.env.BASE_URL
+  expect(links).toEqual([
+    [en.statement.link, `${base}accessibility/`],
+    [en.privacy.link, `${base}privacy/`],
+    [en.analytics.link, `${base}analytics/`],
+  ])
 })
 
 it('shows the developers in the dialog', async () => {

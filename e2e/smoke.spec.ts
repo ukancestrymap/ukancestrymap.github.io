@@ -1,8 +1,9 @@
 // Checks the production build as a visitor sees it: what the component tests,
 // which render the app in a test page, cannot. Behaviour is tested there.
 
-import { expect, type Page, test } from '@playwright/test'
+import { expect, type Page, test } from './fixtures.ts'
 import { en } from '../src/content/en.ts'
+import { analyticsScriptUrl } from '../src/content/links.ts'
 
 test('the built site loads and works under its base path', async ({
   page,
@@ -46,19 +47,43 @@ test('the built site loads and works under its base path', async ({
   expect(problems).toEqual([])
 })
 
-test('the accessibility statement loads under the base path, and links back', async ({
+// The site's text pages: their paths, and their copy.
+const textPages = [
+  ['./accessibility/', en.statement],
+  ['./privacy/', en.privacy],
+  ['./analytics/', en.analytics],
+] as const
+
+// Deploy sets PLAUSIBLE_DOMAIN, so published builds count visits; no other
+// build does. The fixture answers the script, so nothing is counted here.
+test('includes the analytics script exactly when the build is to be published', async ({
   page,
-  baseURL,
 }) => {
-  await page.goto('./accessibility/')
-  await expect(page).toHaveTitle(en.statement.pageTitle)
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-    en.statement.heading,
-  )
-  await page.getByRole('link', { name: en.statement.back }).click()
-  await expect(page).toHaveURL(String(baseURL))
-  await expect(page).toHaveTitle(en.appTitle)
+  const domain = process.env.PLAUSIBLE_DOMAIN
+  for (const path of ['./', ...textPages.map(([page]) => page)]) {
+    await page.goto(path)
+    const script = page.locator(`script[src="${analyticsScriptUrl}"]`)
+    if (domain) {
+      await expect(script).toHaveAttribute('data-domain', domain)
+    } else {
+      await expect(script).toHaveCount(0)
+    }
+  }
 })
+
+for (const [path, { pageTitle, heading }] of textPages) {
+  test(`${path} loads under the base path, and links back to the map`, async ({
+    page,
+    baseURL,
+  }) => {
+    await page.goto(path)
+    await expect(page).toHaveTitle(pageTitle)
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(heading)
+    await page.getByRole('link', { name: en.statement.back }).click()
+    await expect(page).toHaveURL(String(baseURL))
+    await expect(page).toHaveTitle(en.appTitle)
+  })
+}
 
 // src/theme-init.js, inlined into each page, sets the theme before the first
 // paint, so a dark page never flashes white. With the app's scripts blocked,
