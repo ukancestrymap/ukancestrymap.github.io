@@ -38,13 +38,13 @@ jobs:
       # No upload on PRs: Dependabot's PRs get a read-only token. The next step gates PRs.
       - name: Run zizmor (upload to code scanning)
         if: github.event_name != 'pull_request'
-        uses: zizmorcore/zizmor-action@cc914d7f3750a2d13d75c7f184a1060aa0e9d482 # v0.6.4
+        uses: zizmorcore/zizmor-action@85b2b9fb8e3325e7a23d7d0a9d7ba5ae0f999e3e # v0.7.1
         with:
           inputs: .github
           persona: pedantic
 
       - name: Run zizmor (annotate and fail on findings)
-        uses: zizmorcore/zizmor-action@cc914d7f3750a2d13d75c7f184a1060aa0e9d482 # v0.6.4
+        uses: zizmorcore/zizmor-action@85b2b9fb8e3325e7a23d7d0a9d7ba5ae0f999e3e # v0.7.1
         with:
           inputs: .github
           persona: pedantic
